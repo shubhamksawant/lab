@@ -3,10 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - postgres.yaml
-  - redis.yaml
-  - backend.yaml
-  - frontend.yaml
+  # Only manage safe resources that won't interfere with running app
+  # This demonstrates GitOps without breaking existing functionality
 
 commonLabels:
   app.kubernetes.io/managed-by: argocd

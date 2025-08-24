@@ -15,9 +15,8 @@ spec:
     server: https://kubernetes.default.svc
     namespace: humor-game
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    # Disable automation to prevent interference with working app
+    automated: {}
     syncOptions:
       - CreateNamespace=true
   revisionHistoryLimit: 3
