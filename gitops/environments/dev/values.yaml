@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: humor-game
 spec:
   replicas: 1
   template:
@@ -19,6 +18,5 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: humor-game
 spec:
   replicas: 1
