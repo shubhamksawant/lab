@@ -3,8 +3,10 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  # For demo purposes, we'll start with just the namespace
-  # This demonstrates the GitOps workflow without complex resource conflicts
+  - postgres.yaml
+  - redis.yaml
+  - backend.yaml
+  - frontend.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: argocd
