@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
-    targetRevision: HEAD
+    targetRevision: home-lab
     path: gitops/environments/dev
   destination:
     server: https://kubernetes.default.svc
