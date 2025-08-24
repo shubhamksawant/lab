@@ -101,16 +101,16 @@ kubectl apply -f k8s/ingress.yaml
 echo "⏳ Waiting for ingress to be ready..."
 sleep 10
 
-# Add local DNS entries
-add_local_dns "prometheus.gameapp.local" "$INGRESS_IP"
-add_local_dns "grafana.gameapp.local" "$INGRESS_IP"
+# Add local DNS entries (use localhost for k3d port mapping)
+add_local_dns "prometheus.gameapp.local" "127.0.0.1"
+add_local_dns "grafana.gameapp.local" "127.0.0.1"
 
 echo ""
 echo "🎉 Monitoring setup complete!"
 echo ""
 echo "📊 Access your monitoring services:"
-echo "   Prometheus: http://prometheus.gameapp.local"
-echo "   Grafana:   http://grafana.gameapp.local"
+echo "   Prometheus: http://prometheus.gameapp.local:8080"
+echo "   Grafana:   http://grafana.gameapp.local:8080"
 echo ""
 echo "🔐 Default credentials:"
 echo "   Username: admin"

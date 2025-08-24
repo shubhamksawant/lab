@@ -28,8 +28,8 @@ kubectl wait --for=condition=ready pod -l app=grafana -n monitoring
 ## 🌐 Access URLs
 
 ### Local Development
-- **Prometheus**: http://prometheus.gameapp.local
-- **Grafana**: http://grafana.gameapp.local
+- **Prometheus**: http://prometheus.gameapp.local:8080
+- **Grafana**: http://grafana.gameapp.local:8080
 
 ### Production
 - **Prometheus**: http://prometheus.gameapp.games
@@ -46,16 +46,44 @@ kubectl wait --for=condition=ready pod -l app=grafana -n monitoring
 
 ## 📱 Local DNS Setup
 
-The setup script automatically adds these entries to your `/etc/hosts` file:
+The setup script automatically detects your ingress IP and adds entries to your `/etc/hosts` file:
 
 ```bash
-# Local monitoring access
+# Local monitoring access (k3d port mapping)
 127.0.0.1 prometheus.gameapp.local
-127.0.1 grafana.gameapp.local
+127.0.0.1 grafana.gameapp.local
 
-# Production monitoring access (update with your actual IP)
-YOUR_IP prometheus.gameapp.games
-YOUR_IP grafana.gameapp.games
+# Production monitoring access (automatically detected IP)
+# Example after script runs:
+# 172.18.0.2 prometheus.gameapp.games
+# 172.18.0.2 grafana.gameapp.games
+```
+
+### 🔍 How IP Detection Works
+
+**For Local Development (k3d):**
+- Uses `127.0.0.1` (localhost) in `/etc/hosts`
+- Access via `http://prometheus.gameapp.local:8080` (k3d maps port 8080→80)
+- This matches your k3d cluster configuration
+
+**For Production:**
+The script automatically finds your ingress controller IP using this priority:
+
+1. **LoadBalancer IP** (if using cloud provider)
+2. **Cluster IP** (for local k3d clusters)  
+3. **Node IP** (fallback for any cluster type)
+4. **localhost** (final fallback)
+
+```bash
+# You can manually check your ingress IP:
+kubectl get svc -n ingress-nginx
+kubectl get nodes -o wide
+
+# Or use the same detection logic as the script:
+INGRESS_IP=$(kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || \
+             kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.spec.clusterIP}' 2>/dev/null || \
+             kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null)
+echo "Detected IP: $INGRESS_IP"
 ```
 
 ## 🔍 Troubleshooting

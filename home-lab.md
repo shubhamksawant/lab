@@ -1324,6 +1324,7 @@ kubectl get pods -n monitoring
 
 ### Step 4.2: Access Your Monitoring Dashboards
 
+#### **Option 1: Port-Forwarding (Traditional Method)**
 ```bash
 # Access Prometheus (metrics database)
 kubectl port-forward svc/prometheus 9090:9090 -n monitoring &
@@ -1335,6 +1336,39 @@ kubectl port-forward svc/grafana 3000:3000 -n monitoring &
 open http://localhost:9090  # Prometheus UI
 open http://localhost:3000  # Grafana UI (login: admin/admin123)
 ```
+
+#### **Option 2: Ingress-Based Access (Recommended - No Port-Forwarding)**
+
+If you're not comfortable with port-forwarding or want production-style access, we've configured ingress rules for your monitoring services:
+
+**Access URLs (No Port-Forwarding Required):**
+- **Prometheus**: http://prometheus.gameapp.local:8080
+- **Grafana**: http://grafana.gameapp.local:8080
+
+**Quick Setup:**
+```bash
+# Run the automated setup script
+./scripts/access-monitoring.sh
+
+# Or manually apply the configuration
+kubectl apply -f k8s/monitoring-auth.yaml
+kubectl apply -f k8s/ingress.yaml
+```
+
+**Benefits of Ingress Access:**
+- ✅ **No port-forwarding** - access from any device on your network
+- ✅ **Production-like** - mirrors real-world deployment patterns
+- ✅ **Persistent access** - services remain accessible after cluster restarts
+- ✅ **Better security** - basic authentication enabled by default
+- ✅ **Network isolation** - services only accessible through ingress
+
+**📝 Note:** For k3d clusters, the ingress controller is accessible on port 8080 (mapped from port 80). This is automatically configured in your `/etc/hosts` file.
+
+**Default Credentials:**
+- **Grafana**: `admin/admin123`
+- **Prometheus**: No authentication required (read-only)
+
+**📚 Complete Guide:** For detailed setup instructions and troubleshooting, see our [Monitoring Access Guide](docs/monitoring-access-guide.md).
 
 ### Step 4.3: Explore Prometheus Metrics
 
