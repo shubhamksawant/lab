@@ -9,7 +9,13 @@ spec:
   destinations:
     - namespace: humor-game
       server: https://kubernetes.default.svc
-  clusterResourceWhitelist: []
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
   namespaceResourceWhitelist:
     - group: '*'
       kind: '*'
