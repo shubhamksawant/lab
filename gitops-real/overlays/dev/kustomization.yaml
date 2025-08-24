@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/namespace.yaml
+  - ../../base/configmap.yaml
+  - ../../base/secrets.yaml
+  - ../../base/postgres.yaml
+  - ../../base/redis.yaml
+  - ../../base/backend.yaml
+  - ../../base/frontend.yaml
+  - ../../base/ingress.yaml
+
+# Optional: Override replicas for dev environment
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: backend
+      namespace: humor-game
+    spec:
+      replicas: 1

@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: humor-game-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: humor-game
+  source:
+    repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
+    targetRevision: home-lab
+    path: gitops-real/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: humor-game
+  syncPolicy:
+    # START WITH MANUAL SYNC - NO AUTOMATION YET
+    syncOptions:
+      - CreateNamespace=false  # Namespace already exists
+      - ApplyOutOfSyncOnly=true # Only update changed resources
+      - PrunePropagationPolicy=foreground
+  # Ignore common fields that change automatically
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations/deployment.kubernetes.io~1revision
+    - group: ""
+      kind: Service
+      jsonPointers:
+        - /spec/clusterIP
+        - /spec/clusterIPs
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      jsonPointers: [/status]

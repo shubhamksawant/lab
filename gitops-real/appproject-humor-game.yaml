@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: humor-game
+  namespace: argocd
+spec:
+  sourceRepos:
+    - https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
+  destinations:
+    - namespace: humor-game
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist: []
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  orphanedResources:
+    warn: true
