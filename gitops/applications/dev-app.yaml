@@ -16,8 +16,8 @@ spec:
     namespace: humor-game
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: false
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
   revisionHistoryLimit: 3
