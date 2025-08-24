@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: humor-game
+  name: humor-game-gitops
   labels:
     app: humor-memory-game
 
