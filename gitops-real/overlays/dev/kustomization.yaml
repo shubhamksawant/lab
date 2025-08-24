@@ -12,12 +12,11 @@ resources:
   - ../../base/ingress.yaml
 
 # Optional: Override replicas for dev environment
-patchesStrategicMerge:
-  - |-
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
+patches:
+  - target:
+      kind: Deployment
       name: backend
-      namespace: humor-game
-    spec:
-      replicas: 1
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
