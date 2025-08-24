@@ -26,11 +26,24 @@ spec:
       kind: Deployment
       jsonPointers:
         - /spec/template/metadata/annotations/deployment.kubernetes.io~1revision
+        - /metadata/annotations/argocd.argoproj.io~1tracking-id
+        - /metadata/labels/app.kubernetes.io~1managed-by
+        - /metadata/labels/app.kubernetes.io~1part-of
+        - /spec/template/metadata/labels/app.kubernetes.io~1managed-by
+        - /spec/template/metadata/labels/app.kubernetes.io~1part-of
+        - /spec/template/spec/containers/0/env/0/valueFrom
     - group: ""
       kind: Service
       jsonPointers:
         - /spec/clusterIP
         - /spec/clusterIPs
+    - group: ""
+      kind: ConfigMap
+      jsonPointers:
+        - /metadata/resourceVersion
+        - /metadata/annotations/argocd.argoproj.io~1tracking-id
+        - /metadata/labels/app.kubernetes.io~1managed-by
+        - /metadata/labels/app.kubernetes.io~1part-of
     - group: autoscaling
       kind: HorizontalPodAutoscaler
       jsonPointers: [/status]
