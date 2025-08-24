@@ -9,7 +9,7 @@ spec:
   project: humor-game
   source:
     repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
-    targetRevision: home-lab
+    targetRevision: gitops
     path: gitops-real
   destination:
     server: https://kubernetes.default.svc
