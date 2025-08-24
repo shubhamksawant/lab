@@ -8,6 +8,7 @@ out/
 .env
 .env.*
 !.env.example
+!.env.template
 .DS_Store
 Thumbs.db
 *.log
@@ -75,13 +76,23 @@ terraform.tfvars*
 # Kubernetes
 kubeconfig
 *.kubeconfig
+k8s/.env
+k8s/secrets.yaml
+k8s/*secrets*.yaml
+k8s/*secret*.yaml
 # Secrets
 secrets/
+*secrets*.yaml
+*secret*.yaml
 *.pem
 *.crt
 *.key
 *.pfx
 *.p12
+*.der
+*.p7b
+*.p7c
+*.pem
 id_rsa
 id_rsa.pub
 # Cloud
@@ -124,5 +135,42 @@ traefik/*.local.yml
 !database/init.sql
 !database/seed.sql
 
+# ========================================
+# ADDITIONAL SECURITY PATTERNS
+# ========================================
+# Environment files
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Certificate files
+*.pem
+*.crt
+*.key
+*.pfx
+*.p12
+*.der
+*.p7b
+*.p7c
+
+# Secret files
+*secret*
+*secrets*
+*password*
+*credential*
+*token*
+*api_key*
+*apikey*
+!.env.template
+!k8s/secrets.template.yaml
+
+# Scripts with secrets
+scripts/*secret*
+scripts/*deploy-with-secrets*
 
 backend.log
