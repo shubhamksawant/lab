@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: humor-game-dev
+  namespace: argocd
+  labels:
+    environment: dev
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
+    targetRevision: HEAD
+    path: gitops/environments/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: humor-game
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  revisionHistoryLimit: 3
