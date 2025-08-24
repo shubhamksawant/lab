@@ -2000,7 +2000,7 @@ You've implemented enterprise observability:
 - **Troubleshooting complex monitoring issues** with systematic approaches
 - **RBAC configuration** for secure, production-ready monitoring
 
----
+-------
 
 ## Milestone 5: GitOps and Automated Deployments
 
