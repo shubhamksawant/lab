@@ -3,8 +3,8 @@ kind: Kustomization
 
 resources:
   - base/namespace.yaml
-  - base/configmap.yaml
-  - base/secrets.yaml
+  - base/humor-game-config.yaml
+  - base/humor-game-secrets.yaml
   - base/postgres.yaml
   - base/redis.yaml
   - base/backend.yaml

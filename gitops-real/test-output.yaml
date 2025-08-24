@@ -20,11 +20,17 @@ data:
   REDIS_PORT: "6379"
 kind: ConfigMap
 metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"API_BASE_URL":"/api","API_PORT":"3001","CORS_ORIGIN":"http://localhost:3000,http://localhost:8080,https://gameapp.games","DB_NAME":"humor_memory_game","DB_USER":"gameuser","FRONTEND_URL":"http://localhost:8080","NODE_ENV":"development","REDIS_HOST":"redis","REDIS_PORT":"6379"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"humor-game-config","namespace":"humor-game"}}
+  creationTimestamp: "2025-08-22T11:11:24Z"
   labels:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: humor-game
   name: humor-game-config
   namespace: humor-game
+  resourceVersion: "62282"
+  uid: 2b3217c8-cbbe-4a83-8b62-17a8d590af85
 ---
 apiVersion: v1
 data:
@@ -123,11 +129,17 @@ data:
   REDIS_PASSWORD: Z2FtZXBhc3MxMjM=
 kind: Secret
 metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"DB_PASSWORD":"Z2FtZXBhc3MxMjM=","JWT_SECRET":"c3VwZXJzZWNyZXRqd3R0b2tlbnNlY3JldA==","REDIS_PASSWORD":"Z2FtZXBhc3MxMjM="},"kind":"Secret","metadata":{"annotations":{},"name":"humor-game-secrets","namespace":"humor-game"},"type":"Opaque"}
+  creationTimestamp: "2025-08-22T11:12:11Z"
   labels:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: humor-game
   name: humor-game-secrets
   namespace: humor-game
+  resourceVersion: "62308"
+  uid: 00d4f621-a6c6-4321-87a5-8bf80cb0bd16
 type: Opaque
 ---
 apiVersion: v1
