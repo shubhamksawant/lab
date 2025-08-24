@@ -16,8 +16,8 @@ spec:
     namespace: humor-game-gitops
   syncPolicy:
     automated:
-      prune: false
-      selfHeal: false
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
   revisionHistoryLimit: 3
