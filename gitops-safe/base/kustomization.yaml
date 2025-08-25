@@ -6,10 +6,9 @@ metadata:
   namespace: humor-game
 
 # Base resources - these are the foundation configurations
-# They won't interfere with your working app initially
-resources: []
-# We'll add base resources here, but for now it's empty
-# This prevents any interference with your working app
+# We'll add resources gradually, starting with safe ones
+resources:
+- configmap.yaml
 
 # Common labels for all resources
 commonLabels:
