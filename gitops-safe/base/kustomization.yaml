@@ -23,6 +23,58 @@ resources:
 - backend-deployment.yaml
 - backend-service.yaml
 
+# Patches to match existing resources exactly
+# This prevents conflicts with your working app
+patches:
+- target:
+    kind: Deployment
+    name: backend
+  patch: |-
+    - op: replace
+      path: /spec/selector/matchLabels
+      value:
+        app: backend
+    - op: replace
+      path: /spec/template/metadata/labels
+      value:
+        app: backend
+- target:
+    kind: Deployment
+    name: frontend
+  patch: |-
+    - op: replace
+      path: /spec/selector/matchLabels
+      value:
+        app: frontend
+    - op: replace
+      path: /spec/template/metadata/labels
+      value:
+        app: frontend
+- target:
+    kind: Deployment
+    name: postgres
+  patch: |-
+    - op: replace
+      path: /spec/selector/matchLabels
+      value:
+        app: postgres
+    - op: replace
+      path: /spec/template/metadata/labels
+      value:
+        app: postgres
+- target:
+    kind: Deployment
+    name: redis
+  patch: |-
+    - op: replace
+      path: /spec/selector/matchLabels
+      value:
+        app: redis
+    - op: replace
+      path: /spec/template/metadata/labels
+      value:
+        app: redis
+
 # NO common labels - this prevents conflicts with your working app
 # We'll add labels later when we're ready to sync
 
