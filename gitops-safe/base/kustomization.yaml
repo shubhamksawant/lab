@@ -5,24 +5,22 @@ metadata:
   name: humor-game-base
   namespace: humor-game
 
-# Base resources - USING ORIGINAL WORKING FILES
-# This fixes the resource conflicts by using your working configurations
+# Base resources - BUILDING FOUNDATION FIRST
+# Start with core infrastructure, then add dependent resources
 resources:
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
 - security-contexts.yaml
-- hpa.yaml
+- redis-deployment.yaml
+- redis-service.yaml
+- postgres-deployment.yaml
+- postgres-service.yaml
 
-# We'll add these back gradually once everything is stable:
-# - redis-deployment.yaml
-# - redis-service.yaml
-# - postgres-deployment.yaml
-# - postgres-service.yaml
-# - frontend-deployment.yaml
-# - frontend-service.yaml
-# - backend-deployment.yaml
-# - backend-service.yaml
+# We'll add these in order to avoid dependency issues:
+# 1. First: Core infrastructure (Redis, Postgres) ← ADDING NOW
+# 2. Then: Application deployments (Backend, Frontend) 
+# 3. Finally: Dependent resources (HPAs, Services)
 
 # NO patches - keeping it simple to avoid conflicts
 # NO common labels - this prevents conflicts with your working app
