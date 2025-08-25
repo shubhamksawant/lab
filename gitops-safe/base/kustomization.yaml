@@ -11,6 +11,9 @@ resources:
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
+- redis-deployment.yaml
+- redis-service.yaml
+- security-contexts.yaml
 
 # Common labels for all resources
 commonLabels:
