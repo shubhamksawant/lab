@@ -9,6 +9,8 @@ metadata:
 # We'll add resources gradually, starting with safe ones
 resources:
 - configmap.yaml
+- pvc.yaml
+- postgres-init.yaml
 
 # Common labels for all resources
 commonLabels:
