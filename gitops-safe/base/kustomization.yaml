@@ -23,11 +23,8 @@ resources:
 - backend-deployment.yaml
 - backend-service.yaml
 
-# Common labels for all resources
-commonLabels:
-  app.kubernetes.io/name: humor-game
-  app.kubernetes.io/version: v1.0.0
-  app.kubernetes.io/component: game-app
+# NO common labels - this prevents conflicts with your working app
+# We'll add labels later when we're ready to sync
 
 # Common annotations
 commonAnnotations:

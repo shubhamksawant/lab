@@ -3,10 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: database
 spec:
   accessModes:
     - ReadWriteOnce

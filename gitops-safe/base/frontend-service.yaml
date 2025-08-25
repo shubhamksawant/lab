@@ -3,15 +3,9 @@ kind: Service
 metadata:
   name: frontend
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: frontend
 spec:
   selector:
     app: frontend
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/component: frontend
   ports:
     - port: 80
       targetPort: 80

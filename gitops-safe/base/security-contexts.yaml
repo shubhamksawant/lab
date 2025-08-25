@@ -6,10 +6,6 @@ kind: ConfigMap
 metadata:
   name: security-contexts
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: security
 data:
   # Pod Security Standards configuration
   pod-security-standards: |

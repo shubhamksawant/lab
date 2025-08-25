@@ -3,23 +3,15 @@ kind: Deployment
 metadata:
   name: frontend
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: frontend
-      app.kubernetes.io/name: humor-game
-      app.kubernetes.io/component: frontend
   template:
     metadata:
       labels:
         app: frontend
-        app.kubernetes.io/name: humor-game
-        app.kubernetes.io/component: frontend
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "80"

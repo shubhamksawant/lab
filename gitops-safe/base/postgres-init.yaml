@@ -3,10 +3,6 @@ kind: ConfigMap
 metadata:
   name: postgres-init
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: database
 data:
   01-init.sql: |
     -- Humor Memory Game Database Schema

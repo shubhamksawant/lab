@@ -3,15 +3,9 @@ kind: Service
 metadata:
   name: redis
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: cache
 spec:
   selector:
     app: redis
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/component: cache
   ports:
     - port: 6379
       targetPort: 6379

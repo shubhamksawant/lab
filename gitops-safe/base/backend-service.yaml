@@ -3,15 +3,9 @@ kind: Service
 metadata:
   name: backend
   namespace: humor-game
-  labels:
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/version: v1.0.0
-    app.kubernetes.io/component: backend
 spec:
   selector:
     app: backend
-    app.kubernetes.io/name: humor-game
-    app.kubernetes.io/component: backend
   ports:
     - port: 3001
       targetPort: 3001
