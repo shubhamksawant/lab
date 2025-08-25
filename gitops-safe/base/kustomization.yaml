@@ -5,21 +5,20 @@ metadata:
   name: humor-game-base
   namespace: humor-game
 
-# Base resources - STARTING WITH ONLY WORKING RESOURCES
-# This fixes the Missing health status by avoiding configuration conflicts
+# Base resources - USING ORIGINAL WORKING FILES
+# This fixes the resource conflicts by using your working configurations
 resources:
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
 - security-contexts.yaml
+- hpa.yaml
 
-# We'll add these back gradually once health status is stable:
+# We'll add these back gradually once everything is stable:
 # - redis-deployment.yaml
 # - redis-service.yaml
 # - postgres-deployment.yaml
 # - postgres-service.yaml
-# - backend-hpa.yaml
-# - frontend-hpa.yaml
 # - frontend-deployment.yaml
 # - frontend-service.yaml
 # - backend-deployment.yaml
