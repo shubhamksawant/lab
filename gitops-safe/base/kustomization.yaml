@@ -5,23 +5,25 @@ metadata:
   name: humor-game-base
   namespace: humor-game
 
-# Base resources - these are the foundation configurations
-# We'll add resources gradually, starting with safe ones
+# Base resources - STARTING WITH ONLY EXISTING RESOURCES
+# This prevents ArgoCD from trying to manage resources that don't exist yet
 resources:
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
-- redis-deployment.yaml
-- redis-service.yaml
 - security-contexts.yaml
-- postgres-deployment.yaml
-- postgres-service.yaml
-- backend-hpa.yaml
-- frontend-hpa.yaml
-- frontend-deployment.yaml
-- frontend-service.yaml
-- backend-deployment.yaml
-- backend-service.yaml
+
+# We'll add these back gradually as we're ready to sync:
+# - redis-deployment.yaml
+# - redis-service.yaml
+# - postgres-deployment.yaml
+# - postgres-service.yaml
+# - backend-hpa.yaml
+# - frontend-hpa.yaml
+# - frontend-deployment.yaml
+# - frontend-service.yaml
+# - backend-deployment.yaml
+# - backend-service.yaml
 
 # NO common labels - this prevents conflicts with your working app
 # We'll add labels later when we're ready to sync
