@@ -18,6 +18,10 @@ resources:
 - postgres-service.yaml
 - backend-hpa.yaml
 - frontend-hpa.yaml
+- frontend-deployment.yaml
+- frontend-service.yaml
+- backend-deployment.yaml
+- backend-service.yaml
 
 # Common labels for all resources
 commonLabels:
