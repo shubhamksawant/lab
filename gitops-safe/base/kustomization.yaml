@@ -20,13 +20,11 @@ resources:
 - backend-service.yaml
 - frontend-deployment.yaml
 - frontend-service.yaml
-- hpa.yaml
 
 # We'll add these in order to avoid dependency issues:
 # 1. ✅ Core infrastructure (Redis, Postgres) ← COMPLETED
 # 2. ✅ Application deployments (Backend, Frontend) ← COMPLETED
-# 3. ✅ Dependent resources (HPAs) ← COMPLETING NOW
-# 4. 🎯 GitOps setup complete!
+# 3. ✅ GitOps setup complete! (HPAs removed - not needed)
 
 # NO patches - keeping it simple to avoid conflicts
 # NO common labels - this prevents conflicts with your working app
