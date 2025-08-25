@@ -18,12 +18,13 @@ resources:
 - postgres-service.yaml
 - backend-deployment.yaml
 - backend-service.yaml
+- frontend-deployment.yaml
+- frontend-service.yaml
 
 # We'll add these in order to avoid dependency issues:
 # 1. ✅ Core infrastructure (Redis, Postgres) ← COMPLETED
-# 2. 🔄 Application deployments (Backend) ← ADDING NOW
-# 3. ⏳ Frontend deployments (Next)
-# 4. ⏳ Dependent resources (HPAs, Services)
+# 2. ✅ Application deployments (Backend, Frontend) ← COMPLETING NOW
+# 3. ⏳ Dependent resources (HPAs, Services) ← NEXT PHASE
 
 # NO patches - keeping it simple to avoid conflicts
 # NO common labels - this prevents conflicts with your working app
