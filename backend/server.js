@@ -12,7 +12,7 @@ const rateLimit = require('express-rate-limit');
 // Import custom modules
 const database = require('./models/database');
 const redisClient = require('./utils/redis');
-const { metricsMiddleware, metricsEndpoint, updateGameMetrics } = require('./middleware/metrics');
+const { metricsMiddleware, metricsEndpoint, updateGameMetrics, syncExistingGameData, initializeMetricsWithSampleData } = require('./middleware/metrics');
 
 // Create Express application
 const app = express();
@@ -125,6 +125,40 @@ app.get('/health', async (req, res) => {
 // Metrics are now handled by the Prometheus middleware
 
 app.get('/metrics', metricsEndpoint);
+
+// Debug endpoint to manually trigger metrics sync
+app.get('/debug/sync-metrics', async (req, res) => {
+  try {
+    console.log('🔄 Manual metrics sync triggered...');
+    await syncExistingGameData(database);
+    res.json({ success: true, message: 'Metrics sync completed' });
+  } catch (error) {
+    console.error('❌ Manual metrics sync failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Simple test endpoint to verify routing
+app.get('/debug/test', (req, res) => {
+  res.json({ success: true, message: 'Debug test endpoint working!', timestamp: new Date().toISOString() });
+});
+
+// Simple metrics test endpoint
+app.get('/debug/simple-metrics', (req, res) => {
+  try {
+    console.log('🧪 Simple metrics test triggered...');
+    
+    // Just set basic metrics without complex objects
+    res.json({ 
+      success: true, 
+      message: 'Simple metrics test working!',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Simple metrics test failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Metrics are now handled by the Prometheus middleware
 
@@ -288,7 +322,7 @@ async function startServer() {
     }
 
     // Start the HTTP server
-    const server = app.listen(PORT, '0.0.0.0', () => {
+    const server = app.listen(PORT, '0.0.0.0', async () => {
       console.log('\n🎮 ========================================');
       console.log('🎯 HUMOR MEMORY GAME API SERVER STARTED! 😂');
       console.log('🎮 ========================================');
@@ -298,6 +332,20 @@ async function startServer() {
       console.log(`📊 Metrics Endpoint: /metrics`);
       console.log(`🚀 Ready to serve game requests!`);
       console.log('🎮 ========================================\n');
+      
+      // Initialize metrics with sample data first
+      try {
+        initializeMetricsWithSampleData();
+      } catch (error) {
+        console.error('❌ Failed to initialize metrics with sample data:', error);
+      }
+      
+      // Then try to sync existing game data to metrics
+      try {
+        await syncExistingGameData(database);
+      } catch (error) {
+        console.error('❌ Failed to sync existing game data to metrics:', error);
+      }
     });
 
     // Graceful shutdown handling

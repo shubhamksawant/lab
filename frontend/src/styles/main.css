@@ -535,7 +535,7 @@ body {
   max-height: 120px;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   transform-style: preserve-3d;
   position: relative;
   box-shadow: var(--card-shadow);
@@ -548,6 +548,11 @@ body {
 
 .memory-card.flipped {
   transform: rotateY(180deg);
+}
+
+.memory-card.flipping {
+  pointer-events: none;
+  cursor: wait;
 }
 
 .memory-card.matched {

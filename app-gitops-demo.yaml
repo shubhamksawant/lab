@@ -3,22 +3,21 @@ kind: Application
 metadata:
   name: gitops-demo-app
   namespace: argocd
-  labels:
-    purpose: demo
-    environment: learning
 spec:
-  project: default
+  project: gitops-demo
+  destination:
+    namespace: gitops-demo
+    server: https://kubernetes.default.svc
   source:
     repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
     targetRevision: home-lab
     path: gitops-demo/base
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: gitops-demo
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
-  revisionHistoryLimit: 3
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations

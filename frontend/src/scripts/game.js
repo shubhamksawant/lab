@@ -622,11 +622,15 @@ function handleCardClick(cardElement) {
   if (!gameState.isGameActive) return;
   if (
     cardElement.classList.contains('flipped') ||
-    cardElement.classList.contains('matched')
+    cardElement.classList.contains('matched') ||
+    cardElement.classList.contains('flipping')
   )
     return;
   if (gameState.flippedCards.length >= 2) return;
 
+  // Add flipping class to prevent rapid clicks during animation
+  cardElement.classList.add('flipping');
+  
   flipCard(cardElement);
   gameState.flippedCards.push(cardElement);
 
@@ -643,6 +647,11 @@ function handleCardClick(cardElement) {
 function flipCard(cardElement) {
   cardElement.classList.add('flipped');
   playSound('flip');
+  
+  // Remove flipping class after animation completes (150ms)
+  setTimeout(() => {
+    cardElement.classList.remove('flipping');
+  }, 150);
 }
 
 function handleMatchSuccess(card1, card2, result) {

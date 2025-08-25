@@ -210,11 +210,29 @@ router.post('/match', validateCardMatch, async (req, res) => {
     // Increment moves counter
     gameSession.moves++;
 
-    // Update cache
-    await redisCache.cacheGameSession(gameId, gameSession);
+    // Update cache (with error handling)
+    try {
+      await redisCache.cacheGameSession(gameId, gameSession);
+    } catch (cacheError) {
+      console.warn('⚠️ Cache update failed (non-critical):', cacheError.message);
+      // Continue execution - cache failure shouldn't break the game
+    }
 
-    // Track user activity
-    await redisCache.trackUserActivity(gameSession.username, 'match_attempt');
+    // Track user activity (with error handling)
+    try {
+      await redisCache.trackUserActivity(gameSession.username, 'match_attempt');
+    } catch (activityError) {
+      console.warn('⚠️ Activity tracking failed (non-critical):', activityError.message);
+      // Continue execution - tracking failure shouldn't break the game
+    }
+
+    // Update active games metrics (with error handling)
+    try {
+      updateGameMetrics.setActiveGames(gameSession.difficulty, 1, 'active');
+    } catch (metricsError) {
+      console.warn('⚠️ Metrics update failed (non-critical):', metricsError.message);
+      // Continue execution - metrics failure shouldn't break the game
+    }
 
     // Check if game is completed (all cards matched)
     const totalPairs = gameSession.cards.length / 2;
@@ -339,6 +357,24 @@ router.post('/complete', validateGameComplete, async (req, res) => {
 
     // Track completion analytics
     await redisCache.trackUserActivity(gameSession.username, 'game_complete');
+
+    // Record game metrics for Prometheus (with error handling)
+    try {
+      const timeSeconds = timeElapsed / 1000; // Convert ms to seconds
+      updateGameMetrics.recordScore(
+        gameSession.difficulty,
+        gameSession.username,
+        scoreBreakdown.totalScore,
+        timeSeconds
+      );
+      
+      // Record game accuracy
+      const accuracy = (totalCardsMatched / gameSession.moves) * 100;
+      updateGameMetrics.recordGameAccuracy(gameSession.difficulty, accuracy);
+    } catch (metricsError) {
+      console.warn('⚠️ Game completion metrics failed (non-critical):', metricsError.message);
+      // Continue execution - metrics failure shouldn't break the game completion
+    }
 
     console.log(
       `🏆 Game completed by ${gameSession.username}! Score: ${scoreBreakdown.totalScore}, Time: ${timeElapsed}ms`

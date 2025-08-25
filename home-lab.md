@@ -1301,6 +1301,8 @@ The monitoring stack includes Prometheus (metrics collection) and Grafana (visua
 
 **📚 Documentation:** Each checkpoint has detailed guides in our [docs/](docs/) folder. Start with [Troubleshooting Guide](docs/troubleshooting.md) if you get stuck!
 
+**🔧 Monitoring Issues?** If you encounter "No data" in Grafana dashboards or other monitoring problems, see our comprehensive [Monitoring Troubleshooting Guide](docs/monitoring-troubleshooting.md) for step-by-step solutions to common monitoring issues.
+
 ```bash
 # Create monitoring namespace and RBAC permissions
 kubectl apply -f k8s/prometheus-rbac.yaml
@@ -1958,72 +1960,6 @@ You've implemented enterprise observability:
 - **Load testing** to validate monitoring under stress
 - **Production monitoring patterns** used by major technology companies
 
-### 📋 Unified Diff for home-lab.md
-
-**Changes Made to Milestone 4:**
-```diff
-+ **⏱️ Performance Note:** Prometheus pod creation can take 10-15 minutes on first deployment due to large images and RBAC setup. Subsequent deployments are much faster (2-5 minutes).
-
-+ #### **✅ Checkpoint List - Milestone 4**
-+ - [ ] Monitoring namespace and RBAC created
-+ - [ ] Prometheus and Grafana pods running (1/1 Ready)
-+ - [ ] Prometheus targets showing "UP" status
-+ - [ ] Grafana accessible at localhost:3000
-+ - [ ] Basic dashboard panels showing data
-+ - [ ] Custom application metrics working
-+ - [ ] Production metrics script generating data
-+ - [ ] Advanced dashboard imported successfully
-
-+ ### 📸 Screenshots: Prometheus & Grafana Success
-+ **Prometheus Targets Page (`/targets`):**
-+ - Should show multiple `kubernetes-pods` targets
-+ - All targets should display "UP" status
-+ - Namespace should show `humor-game` for your app pods
-
-+ **Grafana Dashboard with 4 Panels:**
-+ - **Panel 1**: Pod CPU Usage showing real-time data
-+ - **Panel 2**: Pod Memory Usage with stable values
-+ - **Panel 3**: HTTP Request Rate with traffic spikes
-+ - **Panel 4**: Pod Status showing all pods as healthy
-
-+ **Expected Output:**
-+ ```
-+ ✅ Prometheus: 5+ targets UP
-+ ✅ Grafana: All 4 panels showing data
-+ ✅ Metrics: Real-time updates during load testing
-+ ✅ RBAC: No permission errors in logs
-+ ```
-
-+ ### 🎯 Advanced App-Based Queries
-+ **Game Performance Metrics:**
-+ ```bash
-+ # Game completion rate by user
-+ rate(game_completion_total[5m]) by (username)
-+ # ... more queries
-+ ```
-
-+ ### 📊 Resource Limits & Monitoring
-+ **Set Resource Limits for Production:**
-+ ```yaml
-+ resources:
-+   requests:
-+     memory: "256Mi"
-+     cpu: "250m"
-+   limits:
-+     memory: "512Mi"
-+     cpu: "500m"
-+ ```
-
-+ ### 🔧 Troubleshooting Steps & Commands
-+ **Step-by-step troubleshooting with exact commands**
-+ **Port-forwarding fixes**
-+ **RBAC verification commands**
-+ **Connectivity testing**
-+ **Metrics generation scripts**
-
-**Dashboard import steps and troubleshooting**
-**Quick copy commands for easy access**
-```
 
 ### Professional Skills Gained
 
@@ -2041,6 +1977,10 @@ You've implemented enterprise observability:
 **Learning Objective:** Implement GitOps workflows that automatically deploy your applications when code changes, following the same patterns used by platform teams at major technology companies.
 
 **Why this matters:** Manual deployments don't scale. This milestone teaches you how to build deployment pipelines that are reliable, auditable, and can be trusted with production systems.
+
+**⚠️ CRITICAL: This implementation follows our proven safe approach that won't break your working application.**
+
+**🌐 Domain Note: Replace `gameapp.local` with your own domain from Milestone 1 throughout this guide.**
 
 ### Step 5.1: Understanding GitOps Principles
 
@@ -2062,7 +2002,7 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Wait for ArgoCD to be ready (this takes several minutes)
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=300s
+kubectl wait --for=condition=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=300s
 
 # Get the initial admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
@@ -2070,70 +2010,164 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 # Access ArgoCD UI
 kubectl port-forward svc/argocd-server -n argocd 8080:443 &
-open https://localhost:8080
+# Use your own domain pattern (replace 'gameapp.local' with your domain)
+open http://argocd.gameapp.local:8080/
 # Login with username: admin, password: (from above command)
 ```
 
-### Step 5.3: Set Up GitOps Repository Structure
+**Expected Output:**
+- ArgoCD pods should show `Running` status
+- UI accessible at `http://argocd.gameapp.local:8080/` (use your own domain)
+- Login successful with admin credentials
 
-For GitOps to work, you need a repository structure that separates application code from deployment configuration.
+### Step 5.3: Create Safe GitOps Structure
 
-**Create a new GitOps repository** (this would be separate from your application code):
+**We use a proven safe approach that won't interfere with your working app:**
 
 ```bash
-# Example repository structure:
-gitops-humor-game/
-├── environments/
-│   ├── dev/
-│   │   ├── kustomization.yaml
-│   │   └── values.yaml
-│   ├── staging/
-│   │   ├── kustomization.yaml  
-│   │   └── values.yaml
-│   └── prod/
-│       ├── kustomization.yaml
-│       └── values.yaml
-├── base/
-│   ├── backend.yaml        # Copy from your k8s/ directory
-│   ├── frontend.yaml       # Copy from your k8s/ directory
-│   ├── postgres.yaml       # Copy from your k8s/ directory
-│   ├── redis.yaml          # Copy from your k8s/ directory
-│   └── kustomization.yaml
-└── applications/
-    ├── dev-app.yaml
-    ├── staging-app.yaml
-    └── prod-app.yaml
+# Create GitOps directory structure
+mkdir -p gitops-safe/base
+mkdir -p gitops-safe/overlays/dev
+
+# Copy your working YAML files (don't modify them!)
+cp k8s/configmap.yaml gitops-safe/base/
+cp k8s/postgres.yaml gitops-safe/base/
+cp k8s/redis.yaml gitops-safe/base/
+cp k8s/backend.yaml gitops-safe/base/
+cp k8s/frontend.yaml gitops-safe/base/
 ```
 
-**Important Note:** Use the actual working YAML files from your `k8s/` directory as the base. Don't create simplified versions - GitOps works best with your tested, complete configurations.
+**Repository Structure:**
+```
+gitops-safe/
+├── base/
+│   ├── configmap.yaml      # Your working config
+│   ├── postgres.yaml       # Your working postgres
+│   ├── redis.yaml          # Your working redis
+│   ├── backend.yaml        # Your working backend
+│   ├── frontend.yaml       # Your working frontend
+│   └── kustomization.yaml  # Resource list
+└── overlays/
+    └── dev/
+        └── kustomization.yaml  # Environment overlay
+```
 
-### Step 5.4: Create Your First GitOps Application
+### Step 5.4: Create ArgoCD Project and Application
 
-**Create an ArgoCD Application for your dev environment:**
+**Step 4a: Create ArgoCD Project (Security Boundary)**
 
 ```yaml
-# applications/dev-app.yaml
+# gitops-safe/argocd-project.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: humor-game-safe
+  namespace: argocd
+spec:
+  description: "Safe GitOps for Humor Game - Read Only"
+  sourceRepos:
+  - https://github.com/YOUR_USERNAME/YOUR_REPO
+  destinations:
+  - namespace: humor-game
+    server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: PersistentVolumeClaim
+  - group: ""
+    kind: Service
+  - group: apps
+    kind: Deployment
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+```
+
+**Step 4b: Create ArgoCD Application (Monitoring Only)**
+
+```yaml
+# gitops-safe/argocd-application.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: humor-game-dev
+  name: humor-game-monitor
   namespace: argocd
 spec:
-  project: default
+  project: humor-game-safe
   source:
-    repoURL: https://github.com/yourusername/gitops-humor-game
-    targetRevision: HEAD
-    path: environments/dev
+    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO
+    targetRevision: gitops
+    path: gitops-safe/overlays/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: humor-game
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+    automated: {}  # Manual sync only - SAFE!
+    prune: false   # Don't delete anything
 ```
+
+### Step 5.5: Apply GitOps Configuration
+
+```bash
+# Apply ArgoCD project
+kubectl apply -f gitops-safe/argocd-project.yaml
+
+# Apply ArgoCD application
+kubectl apply -f gitops-safe/argocd-application.yaml
+
+# Check status
+kubectl get applications -n argocd
+```
+
+**Expected Output:**
+```
+NAME                 SYNC STATUS   HEALTH STATUS
+humor-game-monitor   OutOfSync     Healthy
+```
+
+### Step 5.6: Verify GitOps Setup
+
+**Check ArgoCD UI:**
+1. Open `http://argocd.gameapp.local:8080/` (use your own domain)
+2. Look for `humor-game-monitor` application
+3. Should show **APP HEALTH: Healthy** ✅
+4. **SYNC STATUS: OutOfSync** (this is normal and expected)
+
+**Check Resource Count:**
+```bash
+kubectl describe application humor-game-monitor -n argocd | grep "Kind:" | wc -l
+# Should show 12 resources being tracked
+```
+
+### Step 5.7: Test GitOps Workflow
+
+**Make a change and see GitOps in action:**
+```bash
+# Edit any file in gitops-safe/
+# Commit and push
+git add gitops-safe/
+git commit -m "Test GitOps change"
+git push origin gitops
+
+# Watch ArgoCD detect the change
+kubectl get application humor-game-monitor -n argocd
+# Should show OutOfSync status
+```
+
+**🎯 Success Indicators:**
+- ✅ ArgoCD UI shows "Healthy" status
+- ✅ 12 resources being tracked
+- ✅ "OutOfSync" status (normal - Git and cluster differ)
+- ✅ Your working app continues running without interruption
+
+**📚 For detailed troubleshooting and advanced GitOps concepts, see:**
+- [ArgoCD Deep Dive Guide](docs/argocd-deep-dive.md) - Learn what ArgoCD is, why it's needed, and how it works
+- [GitOps Troubleshooting Guide](docs/gitops-troubleshooting.md) - Real-world solutions to issues we encountered
+
+**🚀 Next Steps:**
+- Once comfortable, enable automated sync
+- Add more environments (staging, prod)
+- Implement GitOps for monitoring stack
 
 ```bash
 # Apply the application to ArgoCD
@@ -2165,38 +2199,7 @@ kubectl get pods -n humor-game
 # Should show new number of backend replicas
 ```
 
-### Step 5.6: Environment Promotion Pipeline
 
-**Create a promotion script for moving changes between environments:**
-
-```bash
-#!/bin/bash
-# promote.sh - Promote between environments
-
-FROM_ENV=$1
-TO_ENV=$2
-
-if [ -z "$FROM_ENV" ] || [ -z "$TO_ENV" ]; then
-  echo "Usage: ./promote.sh <from-env> <to-env>"
-  echo "Example: ./promote.sh dev staging"
-  exit 1
-fi
-
-# Get image tags from source environment
-BACKEND_TAG=$(grep "newTag:" environments/$FROM_ENV/kustomization.yaml | awk '{print $2}')
-FRONTEND_TAG=$(grep "newTag:" environments/$FROM_ENV/kustomization.yaml | awk '{print $2}')
-
-# Update target environment
-sed -i "s/newTag: .*/newTag: $BACKEND_TAG/g" environments/$TO_ENV/kustomization.yaml
-
-# Commit changes
-git add environments/$TO_ENV/
-git commit -m "Promote $FROM_ENV to $TO_ENV: $BACKEND_TAG"
-git push
-
-echo "✅ Promoted $FROM_ENV to $TO_ENV successfully"
-echo "🔄 ArgoCD will sync the changes automatically"
-```
 
 ### Checkpoint ✅
 
