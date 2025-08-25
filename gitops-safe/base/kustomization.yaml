@@ -5,78 +5,28 @@ metadata:
   name: humor-game-base
   namespace: humor-game
 
-# Base resources - ALL resources exist in your cluster
-# We're restoring them with exact matching labels
+# Base resources - STARTING WITH ONLY WORKING RESOURCES
+# This fixes the Missing health status by avoiding configuration conflicts
 resources:
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
 - security-contexts.yaml
-- redis-deployment.yaml
-- redis-service.yaml
-- postgres-deployment.yaml
-- postgres-service.yaml
-- backend-hpa.yaml
-- frontend-hpa.yaml
-- frontend-deployment.yaml
-- frontend-service.yaml
-- backend-deployment.yaml
-- backend-service.yaml
 
-# Patches to match existing resources exactly
-# This prevents conflicts with your working app
-patches:
-- target:
-    kind: Deployment
-    name: backend
-  patch: |-
-    - op: replace
-      path: /spec/selector/matchLabels
-      value:
-        app: backend
-    - op: replace
-      path: /spec/template/metadata/labels
-      value:
-        app: backend
-- target:
-    kind: Deployment
-    name: frontend
-  patch: |-
-    - op: replace
-      path: /spec/selector/matchLabels
-      value:
-        app: frontend
-    - op: replace
-      path: /spec/template/metadata/labels
-      value:
-        app: frontend
-- target:
-    kind: Deployment
-    name: postgres
-  patch: |-
-    - op: replace
-      path: /spec/selector/matchLabels
-      value:
-        app: postgres
-    - op: replace
-      path: /spec/template/metadata/labels
-      value:
-        app: postgres
-- target:
-    kind: Deployment
-    name: redis
-  patch: |-
-    - op: replace
-      path: /spec/selector/matchLabels
-      value:
-        app: redis
-    - op: replace
-      path: /spec/template/metadata/labels
-      value:
-        app: redis
+# We'll add these back gradually once health status is stable:
+# - redis-deployment.yaml
+# - redis-service.yaml
+# - postgres-deployment.yaml
+# - postgres-service.yaml
+# - backend-hpa.yaml
+# - frontend-hpa.yaml
+# - frontend-deployment.yaml
+# - frontend-service.yaml
+# - backend-deployment.yaml
+# - backend-service.yaml
 
+# NO patches - keeping it simple to avoid conflicts
 # NO common labels - this prevents conflicts with your working app
-# We'll add labels later when we're ready to sync
 
 # Common annotations
 commonAnnotations:
