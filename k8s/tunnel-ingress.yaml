@@ -1,63 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: humor-game-ingress
+  name: tunnel-ingress
   namespace: humor-game
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Disable SSL redirect for tunnel hosts
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - gameapp.games  # Production domain with SSL
-    secretName: gameapp-prod-tls
   rules:
-    - host: gameapp.local  # For local development (no SSL)
-      http:
-        paths:
-          # API routes - forward to backend
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          # Backend endpoints - forward to backend
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          - path: /metrics
-            pathType: Exact
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          - path: /debug
-            pathType: Prefix
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          # Everything else - serve from frontend
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-    - host: gameapp.games  # For production (with SSL)
+    - host: app.gameapp.games  # Cloudflare tunnel subdomain
       http:
         paths:
           # API routes - forward to backend
@@ -100,45 +55,82 @@ spec:
                   number: 80
 
 ---
-# ArgoCD Ingress for GitOps management
+# Grafana Ingress for monitoring
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argocd-ingress
-  namespace: argocd
+  name: grafana-tunnel-ingress
+  namespace: monitoring
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Disable SSL redirect for tunnel hosts
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    # ArgoCD server configuration for UI access
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - argocd.gameapp.games  # Production ArgoCD with SSL
-    secretName: argocd-prod-tls
   rules:
-    - host: argocd.gameapp.local  # Local ArgoCD access (no SSL)
+    - host: grafana.gameapp.games  # Monitoring subdomain
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: argocd-server
+                name: grafana
                 port:
-                  number: 80
-    - host: argocd.gameapp.games  # Production ArgoCD access (with SSL)
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
+                  number: 3000
 
+---
+# Prometheus Ingress for monitoring
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-tunnel-ingress
+  namespace: monitoring
+  annotations:
+    # Disable SSL redirect for tunnel hosts
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: prometheus.gameapp.games  # Monitoring subdomain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus
+                port:
+                  number: 9090
+
+---
+# ArgoCD Ingress for GitOps
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-tunnel-ingress
+  namespace: argocd
+  annotations:
+    # Disable SSL redirect for tunnel hosts
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: argocd.gameapp.games  # ArgoCD subdomain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80

@@ -33,6 +33,10 @@ function getApiBaseUrl() {
     // Production domain
     console.log('🔧 Production domain detected, returning:', `${protocol}//${hostname}:8443/api`);
     return `${protocol}//${hostname}:8443/api`;
+  } else if (hostname.includes('gameapp.games') || hostname.includes('app.gameapp.games')) {
+    // Tunnel subdomain or any gameapp.games subdomain - use relative path
+    console.log('🔧 Tunnel subdomain detected, returning /api');
+    return '/api';
   } else {
     // Container/K8s environment - use nginx proxy
     console.log('🔧 Container/K8s environment detected, returning /api');

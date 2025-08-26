@@ -2,6 +2,14 @@
 
 *A beginner-friendly guide to deploying production-grade applications using Kubernetes, monitoring, and DevOps best practices*
 
+## 🚨 **CRITICAL: READ THIS BEFORE STARTING**
+
+**⚠️ IMPORTANT:** This project uses a demo domain (`gameapp.games`) that you MUST replace with your own domain before beginning.
+
+**🔗 See: [Domain Replacement Guide](docs/domain-replacement-guide.md)** for the complete list of files to update.
+
+**❌ If you don't replace the domain, the card flipping functionality will break and you'll get stuck at Milestone 1.**
+
 ## At‑a‑glance roadmap (paste at top of home-lab.md)
 ---
 | Milestone | Goal | Do | Checkpoint |
@@ -2292,7 +2300,7 @@ You've implemented professional GitOps workflows:
 
 ## Milestone 6: Global Scale and Production Readiness
 
-**Learning Objective:** Deploy your application with global reach using CDN, implement production security practices, and understand how to scale to handle enterprise-level traffic.
+**Learning Objective:** Deploy your application with global reach using Cloudflare CDN, implement production security practices, and understand how to scale to handle enterprise-level traffic.
 
 **Why this matters:** This milestone transforms your local application into one that can serve users globally with the same performance and reliability patterns used by companies like Cloudflare and AWS.
 
@@ -2301,28 +2309,41 @@ You've implemented professional GitOps workflows:
 **Required for this milestone:**
 - A domain name you own ($10-15/year from any registrar)
 - Cloudflare account (free tier is sufficient)
-- Public server or cloud instance (optional for full global deployment)
+- Local k3d cluster running (from previous milestones)
 
-**Note:** You can complete most of this milestone locally to understand the concepts, then apply them to a real production environment when ready.
+**Note:** This implementation uses Cloudflare Tunnel to expose your local k3d cluster to the internet, making it accessible globally without needing a public server.
 
-### Step 6.1: Domain and DNS Setup
+### Step 6.1: Domain and DNS Setup with Cloudflare
 
 **Configure your domain with Cloudflare:**
 
-1. **Add your domain to Cloudflare:**
-   - Login to Cloudflare dashboard
-   - Click "Add Site" and enter your domain
-   - Choose the free plan
-   - Update nameservers at your domain registrar
+1. **Create Cloudflare Account:**
+   - Go to [cloudflare.com](https://cloudflare.com)
+   - Sign up for a free account
+   - Verify your email address
 
-2. **Configure DNS records:**
-   ```bash
-   # In Cloudflare dashboard, add A record:
-   # Type: A
-   # Name: game (creates game.yourdomain.com)
-   # Content: Your server's public IP
-   # Proxy: Enabled (orange cloud icon)
-   ```
+2. **Add Your Domain to Cloudflare:**
+   - In Cloudflare dashboard, click "Add Site"
+   - Enter your domain (e.g., `yourdomain.com`)
+   - Choose the **Free plan** (sufficient for production use)
+   - Select "Quick scan for DNS records" (recommended)
+   - Click "Continue"
+
+3. **Update Nameservers at Your Registrar:**
+   - Cloudflare will provide 2 nameservers (e.g., `katja.ns.cloudflare.com`, `sullivan.ns.cloudflare.com`)
+   - Go to your domain registrar (Namecheap, GoDaddy, etc.)
+   - Navigate to Domain Management → Nameservers
+   - Change from default to "Custom DNS"
+   - Add both Cloudflare nameservers
+   - **Save changes**
+
+4. **Wait for DNS Propagation:**
+   - DNS changes take 24-48 hours to fully propagate
+   - Monitor progress at [whatsmydns.net](https://whatsmydns.net)
+   - Enter your domain and check NS records
+   - Wait until they show Cloudflare nameservers
+
+**⚠️ Important:** Replace `yourdomain.com` with your actual domain name throughout this guide.
 
 ### Step 6.2: Install cert-manager for Automatic SSL
 
@@ -2352,12 +2373,125 @@ spec:
         ingress:
           class: nginx
 EOF
-```
 
-### Step 6.3: Update Ingress for Production Domain
+# Verify ClusterIssuer is ready
+kubectl get clusterissuer letsencrypt-prod
+# Should show: READY: True
+
+### Step 6.3: Set Up Cloudflare Tunnel (Production Access)
+
+**Why Cloudflare Tunnel?** Since you're running k3d locally, Cloudflare Tunnel provides secure, production-grade access without needing router port forwarding or exposing your local network.
+
+1. **Install cloudflared:**
+   ```bash
+   # macOS
+   brew install cloudflare/cloudflare/cloudflared
+   
+   # Linux
+   curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+   sudo dpkg -i cloudflared.deb
+   ```
+
+2. **Authenticate with Cloudflare:**
+   ```bash
+   cloudflared tunnel login
+   # This opens a browser window for authentication
+   # Follow the prompts to log into your Cloudflare account
+   ```
+
+3. **Create a Named Tunnel:**
+   ```bash
+   cloudflared tunnel create yourdomain-tunnel
+   # Replace 'yourdomain-tunnel' with a descriptive name
+   # This creates a persistent tunnel with ID
+   ```
+
+4. **Route Your Domain to the Tunnel:**
+   ```bash
+   # Route main domain (optional - wait until DNS propagates)
+   cloudflared tunnel route dns yourdomain-tunnel yourdomain.com
+   
+   # Route subdomain for immediate access
+   cloudflared tunnel route dns yourdomain-tunnel app.yourdomain.com
+   ```
+
+5. **Create Tunnel Configuration:**
+   ```bash
+   # Create config file
+   cat > ~/.cloudflared/config.yml << 'EOF'
+   tunnel: YOUR_TUNNEL_ID
+   credentials-file: /Users/YOUR_USER/.cloudflared/YOUR_TUNNEL_ID.json
+   
+   ingress:
+     - hostname: app.yourdomain.com
+       service: http://172.20.0.3:80
+       originRequest:
+         originServerName: gameapp.local
+         noTLSVerify: true
+         disableChunkedEncoding: true
+     
+     - hostname: prometheus.app.yourdomain.com
+       service: http://172.20.0.3:80
+       originRequest:
+         originServerName: prometheus.gameapp.local
+         noTLSVerify: true
+         disableChunkedEncoding: true
+     
+     - hostname: grafana.app.yourdomain.com
+       service: http://172.20.0.3:80
+       originRequest:
+         originServerName: grafana.gameapp.local
+         noTLSVerify: true
+         disableChunkedEncoding: true
+     
+     - service: http_status:404
+   EOF
+   
+   # Replace YOUR_TUNNEL_ID with actual tunnel ID from step 3
+   # Replace YOUR_USER with your actual username
+   # Replace yourdomain.com with your actual domain
+   
+   # 🚨 CRITICAL: Use k3d LoadBalancer IP, NOT localhost
+   # The service URL must point to your k3d cluster's LoadBalancer IP
+   # This prevents Error 1033 (Origin is unreachable)
+   # To find your LoadBalancer IP: kubectl get service -A | grep nginx
+   ```
+
+6. **Start the Tunnel:**
+   ```bash
+   cloudflared tunnel run yourdomain-tunnel
+   # Keep this running in a terminal
+   # Or run in background: cloudflared tunnel run yourdomain-tunnel &
+   ```
+
+7. **Verify Tunnel is Running:**
+   ```bash
+   cloudflared tunnel list
+   # Should show your tunnel with status and connections
+   
+   cloudflared tunnel info yourdomain-tunnel
+   # Should show detailed connection information
+   ```
+
+8. **Troubleshoot Common Issues:**
+   
+   **Error 1033: Origin is unreachable**
+   - **Cause**: Tunnel can't reach your local k3d cluster
+   - **Solution**: Use k3d LoadBalancer IP instead of localhost (PERMANENT FIX)
+   - **Fix**: Change `http://localhost:8080` to `http://172.20.0.3:80`
+   - **Why This Works**: Direct k3d cluster access, no localhost dependency
+   
+   **To find your LoadBalancer IP:**
+   ```bash
+   kubectl get service -A | grep nginx
+   # Look for the LoadBalancer IP (e.g., 172.20.0.3)
+   ```
+
+### Step 6.4: Update Ingress for Production Domain
 
 **Modify your ingress to use your real domain:**
 
+1. **Update Main Ingress (for when DNS propagates):**
 ```yaml
 # Update k8s/ingress.yaml to include your domain
 apiVersion: networking.k8s.io/v1
@@ -2367,15 +2501,16 @@ metadata:
   namespace: humor-game
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  ingressClassName: nginx
+     ingressClassName: humor-game-nginx
   tls:
   - hosts:
-    - game.yourdomain.com  # Replace with your actual domain
+       - yourdomain.com  # Replace with your actual domain
     secretName: gameapp-prod-tls
   rules:
-  - host: game.yourdomain.com  # Replace with your actual domain
+     - host: yourdomain.com  # Replace with your actual domain
     http:
       paths:
       - path: /api
@@ -2394,16 +2529,81 @@ spec:
               number: 80
 ```
 
-```bash
-# Apply the updated ingress
-kubectl apply -f k8s/ingress.yaml
+2. **Create Tunnel Ingress (for immediate access):**
+   ```yaml
+   # Create k8s/tunnel-ingress.yaml
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: tunnel-ingress
+     namespace: humor-game
+     annotations:
+       nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+       # No SSL redirect for tunnel to prevent loops
+   spec:
+     ingressClassName: humor-game-nginx
+     rules:
+       - host: app.yourdomain.com  # Tunnel subdomain
+         http:
+           paths:
+             - path: /api
+               pathType: Prefix
+               backend:
+                 service:
+                   name: backend
+                   port:
+                     number: 3001
+             - path: /
+               pathType: Prefix
+               backend:
+                 service:
+                   name: frontend
+                   port:
+                     number: 80
+   ```
 
-# Watch certificate creation
+3. **Apply Both Ingress Configurations:**
+```bash
+   kubectl apply -f k8s/ingress.yaml -f k8s/tunnel-ingress.yaml
+
+   # Watch certificate creation (for main domain)
 kubectl get certificates -n humor-game -w
 # Should show certificate being issued and eventually "Ready: True"
 ```
 
-### Step 6.4: Configure Cloudflare Performance Optimization
+### Step 6.5: Test Your Global Access
+
+**Test your application access through different methods:**
+
+1. **Test Tunnel Access (Immediate):**
+   ```bash
+   # Test tunnel subdomain
+   curl -I "http://app.yourdomain.com"
+   # Should return 200 OK with Cloudflare headers
+   
+   # Test from browser
+   # Open: http://app.yourdomain.com
+   # Should load your game application
+   ```
+
+2. **Test Local Access:**
+   ```bash
+   # Test local ingress
+   curl -I -H "Host: app.yourdomain.com" http://localhost:8080/
+   # Should return 200 OK
+   ```
+
+3. **Monitor Tunnel Status:**
+   ```bash
+   cloudflared tunnel list
+   # Should show your tunnel with active connections
+   
+   cloudflared tunnel info yourdomain-tunnel
+   # Should show connection details
+   ```
+
+### Step 6.6: Configure Cloudflare Performance Optimization
 
 **Enable performance features in Cloudflare dashboard:**
 
@@ -2433,24 +2633,44 @@ kubectl get certificates -n humor-game -w
    - Edge Cache TTL: 1 hour
    ```
 
-### Step 6.5: Test Global Performance
+### Step 6.7: Test Main Domain (After DNS Propagation)
 
-**Test your application from multiple locations:**
+**Once DNS propagation completes (24-48 hours):**
 
+1. **Check DNS Status:**
+   ```bash
+   dig yourdomain.com NS
+   # Should show Cloudflare nameservers:
+   # katja.ns.cloudflare.com
+   # sullivan.ns.cloudflare.com
+   ```
+
+2. **Test Main Domain:**
 ```bash
 # Test SSL certificate
-curl -I https://game.yourdomain.com/
+   curl -I https://yourdomain.com/
 # Should show 200 OK with valid SSL certificate
 
 # Test API through CDN
-curl https://game.yourdomain.com/api/health
+   curl https://yourdomain.com/api/health
 # Should return your health check response
+   ```
 
-# Test performance from different regions using online tools:
-# - WebPageTest.org (test from multiple global locations)
-# - GTmetrix (performance scoring)
-# - Pingdom (uptime monitoring)
-```
+3. **Test Performance from Different Regions:**
+   - [WebPageTest.org](https://webpagetest.org) - Test from multiple global locations
+   - [GTmetrix](https://gtmetrix.com) - Performance analysis
+   - [PageSpeed Insights](https://pagespeed.web.dev/) - Google's performance tool
+
+4. **Verify SSL Certificates:**
+   ```bash
+   kubectl get certificates -A
+   # Should show all certificates as READY: True
+   ```
+
+**🎯 Expected Results:**
+- **Immediate:** `http://app.yourdomain.com` works through tunnel
+- **After DNS:** `https://yourdomain.com` works with full SSL
+- **Performance:** <200ms TTFB from Cloudflare edge locations
 
 **Performance metrics to monitor:**
 - **Time to First Byte (TTFB):** Should be <200ms globally
@@ -2482,12 +2702,23 @@ increase(cloudflare_requests_by_country[1h])
 ### Checkpoint ✅
 
 Your global deployment is working when:
-- Application loads at `https://game.yourdomain.com` with valid SSL
+
+**Immediate (Tunnel Access):**
+- Application loads at `http://app.yourdomain.com` through Cloudflare tunnel
+- Tunnel shows active connections in `cloudflared tunnel list`
+- Local ingress responds to tunnel hostname
+
+**After DNS Propagation (Full Domain Access):**
+- Application loads at `https://yourdomain.com` with valid SSL
 - Cloudflare shows traffic statistics in their dashboard
 - SSL certificate auto-renews (check cert-manager logs)
 - Performance tests show <200ms response times globally
 - CDN cache hit ratios are >80% for static content
 - Monitoring dashboards show global performance metrics
+
+**🔍 Troubleshooting Resources:**
+- See [Cloudflare Deep Dive Guide](docs/cloudflare-deep-dive.md) for detailed explanations
+- See [Global Deployment Troubleshooting](docs/global-deployment-troubleshooting.md) for common issues and fixes
 
 ### Understanding Global Scale Architecture
 
@@ -3025,6 +3256,13 @@ fi
 - **[Resource Management](docs/resource-management.md)** - CPU, memory, and disk optimization
 - **[Load Testing](docs/load-testing.md)** - Performance validation and stress testing
 - **[Scaling Strategies](docs/scaling-strategies.md)** - Horizontal and vertical scaling approaches
+
+### **🌐 Global Deployment & CDN**
+- **[Cloudflare Deep Dive Guide](docs/cloudflare-deep-dive.md)** - Complete explanation of Cloudflare, CDN principles, and production deployment
+- **[Global Deployment Troubleshooting](docs/global-deployment-troubleshooting.md)** - Common issues, diagnostic commands, and step-by-step solutions for global deployments
+
+### **🔧 Essential Setup**
+- **[Domain Replacement Guide](docs/domain-replacement-guide.md)** - **CRITICAL:** Complete list of all files where you must replace the demo domain with your own domain before starting
 
 ---
 
