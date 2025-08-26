@@ -8,6 +8,8 @@
 
 **🔗 See: [Domain Replacement Guide](docs/domain-replacement-guide.md)** for the complete list of files to update.
 
+**🌐 For Cloudflare Tunnel setup, see: [Cloudflare Tunnel Setup Guide](docs/cloudflare-tunnel-setup-guide.md)**
+
 **❌ If you don't replace the domain, the card flipping functionality will break and you'll get stuck at Milestone 1.**
 
 ## At‑a‑glance roadmap (paste at top of home-lab.md)
