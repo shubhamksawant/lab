@@ -1,0 +1,45 @@
+tunnel: 1cc3d5f0-5368-43ee-89ea-2446bc19f111
+credentials-file: /Users/mac/.cloudflared/1cc3d5f0-5368-43ee-89ea-2446bc19f111.json
+
+ingress:
+  # Route app.gameapp.games to your local k3d cluster
+  - hostname: app.gameapp.games
+    service: http://172.20.10.3:8080
+    originRequest:
+      originServerName: app.gameapp.games
+      noTLSVerify: true
+      disableChunkedEncoding: true
+  
+  # Route main domain gameapp.games
+  - hostname: gameapp.games
+    service: http://172.20.10.3:8080
+    originRequest:
+      originServerName: gameapp.games
+      noTLSVerify: true
+      disableChunkedEncoding: true
+  
+  # Route monitoring subdomains with single-level (covered by Universal SSL)
+  - hostname: grafana.gameapp.games
+    service: http://172.20.10.3:8080
+    originRequest:
+      originServerName: grafana.gameapp.games
+      noTLSVerify: true
+      disableChunkedEncoding: true
+  
+  - hostname: prometheus.gameapp.games
+    service: http://172.20.10.3:8080
+    originRequest:
+      originServerName: prometheus.gameapp.games
+      noTLSVerify: true
+      disableChunkedEncoding: true
+  
+  # Route ArgoCD subdomain
+  - hostname: argocd.gameapp.games
+    service: http://172.20.10.3:8080
+    originRequest:
+      originServerName: argocd.gameapp.games
+      noTLSVerify: true
+      disableChunkedEncoding: true
+  
+  # Catch-all for unmatched hostnames
+  - service: http_status:404
