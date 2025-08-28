@@ -27,6 +27,10 @@ logs/
 .vscode/
 .idea/
 .cursor/
+
+# Legacy documentation files (replaced by enhanced docs/)
+homelab.md
+home-lab-bk.md
 # ========================================
 # FRONTEND
 # ========================================
