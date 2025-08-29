@@ -46,7 +46,7 @@ sudo apt-get install -y docker.io docker-compose
 sudo usermod -aG docker $USER
 newgrp docker  # Apply group changes immediately
 
-```
+``` bash
 **Expected Output:**
 Get:1 http://archive.ubuntu.com/ubuntu focal-updates InRelease [114 kB]
 Get:2 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 Packages [1,234 kB]
