@@ -20,7 +20,7 @@ Monitoring isn't optional in production. This milestone teaches you the same obs
 kubectl apply -f k8s/prometheus-rbac.yaml
 
 **Expected Output:**
-```
+```bash
 namespace/monitoring created
 serviceaccount/prometheus created
 clusterrole.rbac.authorization.k8s.io/prometheus created
@@ -31,7 +31,7 @@ clusterrolebinding.rbac.authorization.k8s.io/prometheus created
 kubectl apply -f k8s/monitoring.yaml
 
 **Expected Output:**
-```
+```bash
 configmap/grafana-datasources created
 configmap/prometheus-config created
 deployment.apps/prometheus created
@@ -49,7 +49,7 @@ kubectl get pods -n monitoring
 # Should show prometheus and grafana pods with "1/1 Running"
 
 **Expected Output:**
-```
+```bash
 NAME                          READY   STATUS    RESTARTS   AGE
 grafana-7d8f9c8f9c-abc12     1/1     Running   0          3m
 prometheus-8e9f0d1e2f-def34  1/1     Running   0          3m
@@ -64,7 +64,7 @@ prometheus-8e9f0d1e2f-def34  1/1     Running   0          3m
 kubectl port-forward svc/prometheus 9090:9090 -n monitoring &
 
 **Expected Output:**
-```
+```bash
 Forwarding from 127.0.0.1:9090 -> 9090
 Forwarding from [::1]:9090 -> 9090
 ```
@@ -73,7 +73,7 @@ Forwarding from [::1]:9090 -> 9090
 kubectl port-forward svc/grafana 3000:3000 -n monitoring &
 
 **Expected Output:**
-```
+```bash
 Forwarding from 127.0.0.1:3000 -> 3000
 Forwarding from [::1]:3000 -> 3000
 ```
@@ -109,7 +109,7 @@ Open `http://localhost:9090` and explore the metrics Prometheus is collecting:
 rate(container_cpu_usage_seconds_total[5m])
 
 **Expected Output:**
-```
+```json
 {container="humor-game-backend",namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 0.001234
 {container="humor-game-frontend",namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 0.000567
 ```
@@ -118,7 +118,7 @@ rate(container_cpu_usage_seconds_total[5m])
 container_memory_usage_bytes
 
 **Expected Output:**
-```
+```json
 {container="humor-game-backend",namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 156789012
 {container="humor-game-frontend",namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 23456789
 ```
@@ -127,7 +127,7 @@ container_memory_usage_bytes
 rate(http_requests_total[5m])
 
 **Expected Output:**
-```
+```json
 {method="GET",status="200",endpoint="/api/health"} 0.1
 {method="POST",status="200",endpoint="/api/game"} 0.05
 ```
@@ -136,7 +136,7 @@ rate(http_requests_total[5m])
 increase(kube_pod_container_status_restarts_total[1h])
 
 **Expected Output:**
-```
+```json
 {namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 0
 {namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 0
 ```
@@ -255,7 +255,7 @@ grafana-9d8e7d6c5b-def34  1/1     Running   0          20m
 - **Panel 4**: Pod Status showing all pods as healthy
 
 **Expected Output:**
-```
+```bash
 ✅ Prometheus: 5+ targets UP
 ✅ Grafana: All 4 panels showing data
 ✅ Metrics: Real-time updates during load testing

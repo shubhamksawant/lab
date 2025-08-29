@@ -41,7 +41,7 @@ kubectl top nodes
 kubectl top pods -n humor-game
 
 **Expected Output:**
-```
+```bash
 NAME                    CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 k3d-dev-cluster-server-0   45m          2%     1.2Gi          30%
 k3d-dev-cluster-agent-0    23m          1%     856Mi          21%
@@ -65,7 +65,7 @@ kubectl describe deployment backend -n humor-game | grep -A 10 "Limits\|Requests
 kubectl describe deployment frontend -n humor-game | grep -A 10 "Limits\|Requests"
 
 **Expected Output:**
-```
+```bash
     Limits:
       cpu:     500m
       memory:  512Mi
@@ -119,7 +119,7 @@ Production applications need encrypted traffic:
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
 
 **Expected Output:**
-```
+```bash
 namespace/cert-manager created
 customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
 customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
@@ -143,7 +143,7 @@ kubectl get certificate -n humor-game
 kubectl describe certificate game-tls -n humor-game
 
 **Expected Output:**
-```
+```bash
 NAME       READY   SECRET     AGE
 game-tls   True    game-tls   5m
 ```

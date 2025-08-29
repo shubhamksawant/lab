@@ -24,7 +24,7 @@ k3d cluster create dev-cluster \
   --port "8443:443@loadbalancer"
 
 **Expected Output:**
-```
+```bash
 INFO[0000] Prep: Network
 INFO[0000] Created network 'k3d-dev-cluster'
 INFO[0000] Created volume 'k3d-dev-cluster-images'
@@ -43,7 +43,7 @@ kubectl get nodes -o wide
 # Should show 3 nodes: 1 server, 2 agents, all "Ready"
 
 **Expected Output:**
-```
+```bash
 NAME                    STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE   KERNEL-VERSION   CONTAINER-RUNTIME
 k3d-dev-cluster-server-0   Ready    control-plane,master   2m    v1.28.0+k3s1   172.18.0.2     <none>        Alpine Linux v3.18  6.1.0-13-amd64   containerd://1.7.11
 k3d-dev-cluster-agent-0    Ready    <none>                 2m    v1.28.0+k3s1   172.18.0.3     <none>        Alpine Linux v3.18  6.1.0-13-amd64   containerd://1.7.11
@@ -55,7 +55,7 @@ kubectl cluster-info
 # Should show cluster endpoint and DNS
 
 **Expected Output:**
-```
+```bash
 Kubernetes control plane is running at https://0.0.0.0:6443
 CoreDNS is running at https://0.0.0.0:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 Metrics-server is running at https://0.0.0.0:6443/api/v1/namespaces/kube-system/services/metrics-server:https/proxy
@@ -69,7 +69,7 @@ Metrics-server is running at https://0.0.0.0:6443/api/v1/namespaces/kube-system/
 kubectl apply -f k8s/namespace.yaml
 
 **Expected Output:**
-```
+```bash
 namespace/humor-game created
 ```
 
@@ -78,7 +78,7 @@ kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secrets.yaml
 
 **Expected Output:**
-```
+```bash
 configmap/humor-game-config created
 configmap/frontend-config created
 secret/humor-game-secrets created
@@ -89,7 +89,7 @@ kubectl get configmap -n humor-game
 kubectl get secrets -n humor-game
 
 **Expected Output:**
-```
+```bash
 NAME                DATA   AGE
 frontend-config     1      30s
 humor-game-config   5      30s
@@ -106,7 +106,7 @@ humor-game-secrets   Opaque   5      30s
 kubectl apply -f k8s/postgres.yaml
 
 **Expected Output:**
-```
+```bash
 deployment.apps/humor-game-postgres created
 service/humor-game-postgres created
 persistentvolumeclaim/humor-game-postgres-pvc created
@@ -116,7 +116,7 @@ persistentvolumeclaim/humor-game-postgres-pvc created
 kubectl apply -f k8s/redis.yaml
 
 **Expected Output:**
-```
+```bash
 deployment.apps/humor-game-redis created
 service/humor-game-redis created
 persistentvolumeclaim/humor-game-redis-pvc created
@@ -131,7 +131,7 @@ kubectl get pods -n humor-game
 # Should show postgres and redis pods with "1/1 Running"
 
 **Expected Output:**
-```
+```bash
 NAME                                    READY   STATUS    RESTARTS   AGE
 humor-game-postgres-7d8f9c8f9c-abc12   1/1     Running   0          2m
 humor-game-redis-8e9f0d1e2f-def34      1/1     Running   0          2m
@@ -148,7 +148,7 @@ docker build -t humor-game-frontend:latest ./frontend
 docker build -t humor-game-backend:latest ./backend
 
 **Expected Output:**
-```
+```bash
 Building frontend
 Step 1/8 : FROM nginx:alpine
  ---> 1234567890ab
@@ -172,7 +172,7 @@ docker images | grep humor-game
 # Should show: humor-game-frontend:latest and humor-game-backend:latest
 
 **Expected Output:**
-```
+```bash
 humor-game-backend    latest    0987654321cd   2 minutes ago   156MB
 humor-game-frontend   latest    1234567890ab   2 minutes ago   23.4MB
 ```
@@ -182,7 +182,7 @@ k3d image import humor-game-frontend:latest -c dev-cluster
 k3d image import humor-game-backend:latest -c dev-cluster
 
 **Expected Output:**
-```
+```bash
 Importing image 'humor-game-frontend:latest' into cluster 'dev-cluster'
 Importing image 'humor-game-backend:latest' into cluster 'dev-cluster'
 ```
@@ -194,7 +194,7 @@ Importing image 'humor-game-backend:latest' into cluster 'dev-cluster'
 kubectl apply -f k8s/backend.yaml
 
 **Expected Output:**
-```
+```bash
 deployment.apps/humor-game-backend created
 service/humor-game-backend created
 ```
@@ -203,7 +203,7 @@ service/humor-game-backend created
 kubectl apply -f k8s/frontend.yaml
 
 **Expected Output:**
-```
+```bash
 deployment.apps/humor-game-frontend created
 service/humor-game-frontend created
 ```
@@ -217,7 +217,7 @@ kubectl get pods -n humor-game
 # Should show 4 pods all with "1/1 Running" status
 
 **Expected Output:**
-```
+```bash
 NAME                                    READY   STATUS    RESTARTS   AGE
 humor-game-backend-7d8f9c8f9c-abc12    1/1     Running   0          3m
 humor-game-frontend-8e9f0d1e2f-def34   1/1     Running   0          2m

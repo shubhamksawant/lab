@@ -20,7 +20,7 @@ An Ingress Controller acts like nginx in Docker Compose, routing external traffi
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/baremetal/deploy.yaml
 
 **Expected Output:**
-```
+```bash
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
 configmap/ingress-nginx-controller created
@@ -44,7 +44,7 @@ kubectl wait --namespace ingress-nginx \
 kubectl apply -f k8s/ingress.yaml
 
 **Expected Output:**
-```
+```bash
 ingress.networking.k8s.io/humor-game-ingress created
 ```
 
@@ -52,7 +52,7 @@ ingress.networking.k8s.io/humor-game-ingress created
 kubectl get ingress -n humor-game
 
 **Expected Output:**
-```
+```bash
 NAME               CLASS                HOSTS           ADDRESS   PORTS   AGE
 humor-game-ingress   humor-game-nginx   gameapp.local   80        2m
 ```
@@ -66,7 +66,7 @@ humor-game-ingress   humor-game-nginx   gameapp.local   80        2m
 echo "127.0.0.1 gameapp.local" | sudo tee -a /etc/hosts
 
 **Expected Output:**
-```
+```bash
 127.0.0.1 gameapp.local
 ```
 
@@ -75,7 +75,7 @@ ping gameapp.local
 # Should ping 127.0.0.1 successfully
 
 **Expected Output:**
-```
+```bash
 PING gameapp.local (127.0.0.1): 56 data bytes
 64 bytes from 127.0.0.1: icmp_seq=1 time=0.037 ms
 64 bytes from 127.0.0.1: icmp_seq=2 time=0.034 ms
@@ -116,7 +116,7 @@ kubectl get ingress -n humor-game
 # Should show: humor-game-ingress with humor-game-nginx class
 
 **Expected Output:**
-```
+```bash
 NAME               CLASS                HOSTS           ADDRESS   PORTS   AGE
 humor-game-ingress   humor-game-nginx   gameapp.local   80        88m
 ```
@@ -126,7 +126,7 @@ kubectl get pods -n ingress-nginx
 # Should show: nginx-ingress-controller pod with "1/1 Running"
 
 **Expected Output:**
-```
+```bash
 NAME                                       READY   STATUS    RESTARTS   AGE
 nginx-ingress-controller-7c8b7c8b7c8b    1/1     Running   0          88m
 ```
@@ -144,7 +144,7 @@ curl -H "Host: gameapp.local" -I http://localhost:8080/
 # Should return: HTTP/1.1 200 OK
 
 **Expected Output:**
-```
+```html
 HTTP/1.1 200 OK
 Server: nginx/1.25.3
 Content-Type: text/html
@@ -161,7 +161,7 @@ curl -H "Host: gameapp.local" -I http://localhost:8080/scripts/game.js
 # Should return: Content-Type: application/javascript
 
 **Expected Output:**
-```
+```bash
 HTTP/1.1 200 OK
 Server: nginx/1.25.3
 Content-Type: application/javascript

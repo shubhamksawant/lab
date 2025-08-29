@@ -107,7 +107,7 @@ graph TB
 kubectl create namespace argocd
 
 **Expected Output:**
-```
+```bash
 namespace/argocd created
 ```
 
@@ -115,7 +115,7 @@ namespace/argocd created
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 **Expected Output:**
-```
+```bash
 namespace/argocd created
 serviceaccount/argocd-application-controller created
 serviceaccount/argocd-server created
@@ -136,8 +136,8 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 # Save this password - you'll need it to login
 
 **Expected Output:**
-```
-admin123
+```bash
+[PLACEHOLDER]
 ```
 
 # Access ArgoCD UI
@@ -147,7 +147,7 @@ open http://argocd.gameapp.local:8080/
 # Login with username: admin, password: (from above command)
 
 **Expected Output:**
-```
+```bash
 Forwarding from 127.0.0.1:8080 -> 443
 Forwarding from [::1]:8080 -> 443
 ```
@@ -246,7 +246,7 @@ spec:
 kubectl apply -f gitops-safe/argocd-project.yaml
 
 **Expected Output:**
-```
+```bash
 appproject.argoproj.io/humor-game-safe created
 ```
 
@@ -254,7 +254,7 @@ appproject.argoproj.io/humor-game-safe created
 kubectl apply -f gitops-safe/argocd-application.yaml
 
 **Expected Output:**
-```
+```bash
 application.argoproj.io/humor-game-monitor created
 ```
 
@@ -262,7 +262,7 @@ application.argoproj.io/humor-game-monitor created
 kubectl get applications -n argocd
 
 **Expected Output:**
-```
+```bash
 NAME                  PROJECT             SYNC STATUS   HEALTH STATUS   AGE
 humor-game-monitor    humor-game-safe     OutOfSync     Healthy        2m
 ```
@@ -283,7 +283,7 @@ kubectl describe application humor-game-monitor -n argocd | grep "Kind:" | wc -l
 ```
 
 **Expected Output:**
-```
+```bash
 12
 ```
 
@@ -302,7 +302,7 @@ kubectl get application humor-game-monitor -n argocd
 # Should show OutOfSync status
 
 **Expected Output:**
-```
+```bash
 NAME                  PROJECT             SYNC STATUS   HEALTH STATUS   AGE
 humor-game-monitor    humor-game-safe     OutOfSync     Healthy        5m
 ```
