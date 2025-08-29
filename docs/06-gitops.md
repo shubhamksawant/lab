@@ -137,7 +137,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 **Expected Output:**
 ```bash
-[PLACEHOLDER]
+xec [PLACEHOLDER]
 ```
 
 # Access ArgoCD UI
