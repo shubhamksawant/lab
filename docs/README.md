@@ -6,6 +6,12 @@
 [![Beginner Friendly](https://img.shields.io/badge/Beginner-Friendly-blue?style=for-the-badge)](./01-prereqs.md)
 [![Production Ready](https://img.shields.io/badge/Production-Ready-red?style=for-the-badge)](./07-global.md)
 
+## 🎮 **Application Preview**
+
+![Humor Memory Game Interface](../assets/images/hga.jpg)
+
+*The Humor Memory Game: A DevOps Learning Adventure! - A web-based memory game featuring a 4x4 grid of cards, game statistics, and navigation tabs for Game, Leaderboard, My Stats, and About.*
+
 ---
 
 ## 🎯 **Quick Navigation**
@@ -64,7 +70,7 @@
 ### **🚀 Fast Track** *(Experienced Users)*
 ```bash
 # Deploy everything at once
-git clone https://github.com/yourusername/humor-memory-game
+git clone https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
 cd humor-memory-game
 make deploy-all
 make verify
@@ -130,10 +136,10 @@ kubectl get pods -n argocd
 ```
 
 ### **📞 Support Channels**
-- 🐛 **Found a bug?** → [Open GitHub Issue](https://github.com/yourusername/humor-memory-game/issues)
-- 💬 **Have questions?** → [GitHub Discussions](https://github.com/yourusername/humor-memory-game/discussions)
+- 🐛 **Found a bug?** → [Open GitHub Issue](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git/issues)
+- 💬 **Have questions?** → [GitHub Discussions](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git/discussions)
 - 📖 **Need clarification?** → Check [FAQ](09-faq.md) or [Glossary](10-glossary.md)
-- 🎓 **Want to contribute?** → See [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues)
+- 🎓 **Want to contribute?** → See [GitHub Issues](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git/issues)
 
 ### **🚨 Emergency Troubleshooting**
 1. **Pods won't start**: Check [Troubleshooting Guide](08-troubleshooting.md#pod-issues)
@@ -230,7 +236,7 @@ We welcome contributions to improve these guides! Here's how you can help:
 - Improve security recommendations
 - Optimize performance suggestions
 
-**📋 See**: [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues) for detailed instructions
+**📋 See**: [GitHub Issues](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git/issues) for detailed instructions
 
 ---
 
