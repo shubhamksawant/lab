@@ -273,7 +273,7 @@ Special thanks to the open-source community and the maintainers of:
 ![GitHub stars](https://img.shields.io/github/stars/Osomudeya/DevOps-Home-Lab-2025?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/Osomudeya/DevOps-Home-Lab-2025?style=social)
 ![GitHub downloads](https://img.shields.io/github/downloads/Osomudeya/DevOps-Home-Lab-2025/total?style=social)
-![GitHub last commit](https://github.com/Osomudeya/DevOps-Home-Lab-2025)
+![GitHub last commit](https://img.shields.io/github/last-commit/Osomudeya/DevOps-Home-Lab-2025)
 
 **📊 Learning Impact**: 1000+ developers trained • 50+ companies using in production • 95% positive feedback
 
