@@ -14,7 +14,7 @@ metadata:
     nginx.ingress.kubernetes.io/forwarded-host-header: "X-Forwarded-Host"
     # No SSL redirect for tunnel to prevent loops
 spec:
-  ingressClassName: humor-game-nginx
+  ingressClassName: nginx
   rules:
     - host: prometheus.gameapp.games  # Single-level subdomain (covered by Universal SSL)
       http:

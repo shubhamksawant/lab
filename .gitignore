@@ -27,6 +27,7 @@ logs/
 .vscode/
 .idea/
 .cursor/
+medium-blog-post.md
 
 # Legacy documentation files (replaced by enhanced docs/)
 homelab.md

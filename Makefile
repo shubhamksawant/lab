@@ -1,63 +1,43 @@
-# 🎮 Humor Memory Game - Complete Deployment Makefile
-# From Docker Compose to Production Kubernetes
+# Production Kubernetes Homelab - Makefile
+# Convenient commands for deployment, management, and troubleshooting
 
-.PHONY: help build push deploy clean logs status test health
+.PHONY: help deploy-all verify clean-all setup-cluster deploy-app deploy-monitoring deploy-gitops test-endpoints
 
 # Default target
-help:
-	@echo "🎮 Humor Memory Game - Deployment Commands"
-	@echo "=========================================="
+help: ## Show this help message
+	@echo "🎮 Production Kubernetes Homelab - Quick Commands"
 	@echo ""
-	@echo "🏗️  BUILD & PUSH:"
-	@echo "  build          Build all Docker images"
-	@echo "  push           Push images to local registry"
-	@echo "  build-push     Build and push all images"
+	@echo "🚀 Deployment Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E '(deploy|setup|install)' | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "🚀 DEPLOYMENT:"
-	@echo "  deploy         Deploy entire stack to Kubernetes"
-	@echo "  deploy-dev     Deploy with development settings"
-	@echo "  deploy-prod    Deploy with production settings"
+	@echo "🔍 Testing & Verification:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E '(verify|test|check)' | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "📊 MONITORING:"
-	@echo "  deploy-mon     Deploy monitoring stack (Prometheus + Grafana)"
-	@echo "  deploy-argo    Deploy ArgoCD for GitOps"
-	@echo "  deploy-cf      Deploy Cloudflare tunnel"
+	@echo "🧹 Cleanup Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E '(clean|delete|remove)' | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "🔍 INSPECTION:"
-	@echo "  status         Show deployment status"
-	@echo "  logs           Show application logs"
-	@echo "  test           Run health checks"
-	@echo ""
-	@echo "🧹 CLEANUP:"
-	@echo "  clean          Remove all deployments"
-	@echo "  clean-images   Remove local Docker images"
-	@echo "  reset          Complete cluster reset"
-	@echo ""
-	@echo "📚 UTILITIES:"
-	@echo "  setup-k3d      Create k3d cluster"
-	@echo "  setup-registry Create local Docker registry"
-	@echo "  port-forward   Setup port forwarding for services"
+	@echo "🔧 Utility Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '(deploy|setup|install|verify|test|check|clean|delete|remove)' | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-# Build all Docker images
-build:
-	@echo "🔨 Building Docker images..."
-	docker build -t localhost:5001/humor-game-backend:latest ./backend
-	docker build -t localhost:5001/humor-game-frontend:latest ./frontend
-	@echo "✅ Images built successfully"
+##@ 🚀 Deployment Commands
 
-# Push images to local registry
-push:
-	@echo "📤 Pushing images to local registry..."
-	docker push localhost:5001/humor-game-backend:latest
-	docker push localhost:5001/humor-game-frontend:latest
-	@echo "✅ Images pushed successfully"
+setup-cluster: ## Create and configure k3d cluster
+	@echo "🚀 Creating k3d cluster..."
+	k3d cluster create dev-cluster --port "8080:80@loadbalancer" --port "8090:443@loadbalancer" || true
+	@echo "⏳ Waiting for cluster to be ready..."
+	kubectl wait --for=condition=Ready nodes --all --timeout=60s
+	@echo "✅ Cluster ready!"
 
-# Build and push in one command
-build-push: build push
+install-ingress: ## Install NGINX Ingress Controller
+	@echo "🌐 Installing NGINX Ingress Controller..."
+	helm upgrade --install ingress-nginx ingress-nginx \
+		--repo https://kubernetes.github.io/ingress-nginx \
+		--namespace ingress-nginx --create-namespace \
+		--wait --timeout=300s
+	@echo "✅ Ingress controller installed!"
 
-# Deploy entire stack
-deploy:
-	@echo "🚀 Deploying to Kubernetes..."
+deploy-app: ## Deploy the main application (postgres, redis, backend, frontend)
+	@echo "🎮 Deploying main application..."
 	kubectl apply -f k8s/namespace.yaml
 	kubectl apply -f k8s/configmap.yaml
 	kubectl apply -f k8s/postgres.yaml
@@ -65,157 +45,232 @@ deploy:
 	kubectl apply -f k8s/backend.yaml
 	kubectl apply -f k8s/frontend.yaml
 	kubectl apply -f k8s/ingress.yaml
-	@echo "✅ Deployment complete"
+	@echo "⏳ Waiting for pods to be ready..."
+	kubectl wait --for=condition=Ready pods --all -n humor-game --timeout=300s
+	@echo "✅ Application deployed!"
 
-# Deploy with development settings
-deploy-dev:
-	@echo "🔧 Deploying development stack..."
-	kubectl apply -f k8s/namespace.yaml
-	kubectl apply -f k8s/configmap.yaml
-	kubectl apply -f k8s/postgres.yaml
-	kubectl apply -f k8s/redis.yaml
-	kubectl apply -f k8s/backend.yaml
-	kubectl apply -f k8s/frontend.yaml
-	@echo "✅ Development deployment complete"
-
-# Deploy with production settings
-deploy-prod:
-	@echo "🏭 Deploying production stack..."
-	kubectl apply -f k8s/namespace.yaml
-	kubectl apply -f k8s/configmap.yaml
-	kubectl apply -f k8s/postgres.yaml
-	kubectl apply -f k8s/redis.yaml
-	kubectl apply -f k8s/backend.yaml
-	kubectl apply -f k8s/frontend.yaml
-	kubectl apply -f k8s/ingress.yaml
-	@echo "✅ Production deployment complete"
-
-# Deploy monitoring stack
-deploy-mon:
+deploy-monitoring: ## Deploy Prometheus and Grafana monitoring stack
 	@echo "📊 Deploying monitoring stack..."
 	kubectl apply -f k8s/monitoring.yaml
-	@echo "✅ Monitoring deployed"
-	@echo "🌐 Access Prometheus: kubectl port-forward -n monitoring service/prometheus 9090:9090"
-	@echo "📈 Access Grafana: kubectl port-forward -n monitoring service/grafana 3000:3000 (admin/admin123)"
+	kubectl apply -f k8s/monitoring-ingress.yaml
+	@echo "⏳ Waiting for monitoring pods to be ready..."
+	kubectl wait --for=condition=Ready pods --all -n monitoring --timeout=300s
+	@echo "✅ Monitoring stack deployed!"
 
-# Deploy ArgoCD
-deploy-argo:
+deploy-gitops: ## Deploy ArgoCD GitOps platform
 	@echo "🔄 Deploying ArgoCD..."
-	./scripts/setup-argocd.sh
-	@echo "✅ ArgoCD deployed"
+	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	@echo "⏳ Waiting for ArgoCD to be ready..."
+	kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
+	kubectl apply -f gitops-safe/argocd-project.yaml
+	kubectl apply -f gitops-safe/argocd-application.yaml
+	@echo "✅ ArgoCD deployed!"
 
-# Deploy Cloudflare tunnel
-deploy-cf:
-	@echo "☁️  Deploying Cloudflare tunnel..."
-	kubectl apply -f k8s/cloudflare-tunnel.yaml
-	@echo "✅ Cloudflare tunnel deployed"
+deploy-security: ## Apply security contexts and network policies
+	@echo "🔒 Applying security hardening..."
+	kubectl apply -f k8s/security-context.yaml
+	kubectl apply -f k8s/network-policies.yaml
+	kubectl apply -f k8s/hpa.yaml
+	@echo "✅ Security hardening applied!"
 
-# Show deployment status
-status:
-	@echo "📊 Deployment Status"
-	@echo "==================="
+deploy-all: setup-cluster install-ingress deploy-app deploy-monitoring deploy-gitops deploy-security ## Deploy complete infrastructure
+	@echo "🎉 Complete deployment finished!"
 	@echo ""
-	@echo "🔍 Pods:"
+	@echo "🌟 Your application is ready!"
+	@echo "🎮 Game: http://gameapp.local:8080"
+	@echo "📊 Grafana: http://localhost:3000 (port-forward required)"
+	@echo "📈 Prometheus: http://localhost:9090 (port-forward required)"
+	@echo "🔄 ArgoCD: http://localhost:8090 (port-forward required)"
+	@echo ""
+	@echo "Run 'make verify' to check everything is working!"
+
+##@ 🔍 Testing & Verification
+
+verify: ## Verify all deployments and run health checks
+	@echo "🔍 Verifying deployments..."
+	@echo ""
+	@echo "📋 Cluster Status:"
+	kubectl get nodes
+	@echo ""
+	@echo "🎮 Application Pods:"
 	kubectl get pods -n humor-game
 	@echo ""
+	@echo "📊 Monitoring Pods:"
+	kubectl get pods -n monitoring
+	@echo ""
+	@echo "🔄 GitOps Pods:"
+	kubectl get pods -n argocd
+	@echo ""
+	@echo "🌐 Ingress Status:"
+	kubectl get ingress -A
+	@echo ""
+	@echo "🔒 Security Status:"
+	kubectl get hpa -n humor-game
+	kubectl get networkpolicy -n humor-game
+
+test-endpoints: ## Test application endpoints
+	@echo "🧪 Testing application endpoints..."
+	@echo ""
+	@echo "🎮 Application Health:"
+	@curl -s -H "Host: gameapp.local" http://localhost:8080/api/health | jq . || echo "❌ Application not accessible"
+	@echo ""
+	@echo "📊 Backend Metrics:"
+	@curl -s -H "Host: gameapp.local" http://localhost:8080/metrics | head -5 || echo "❌ Metrics not accessible"
+
+check-resources: ## Check resource usage and limits
+	@echo "📊 Resource Usage:"
+	@echo ""
+	@echo "🖥️  Node Resources:"
+	kubectl top nodes || echo "⚠️  Metrics server not ready"
+	@echo ""
+	@echo "🔋 Pod Resources:"
+	kubectl top pods -n humor-game || echo "⚠️  Metrics server not ready"
+	@echo ""
+	@echo "📈 HPA Status:"
+	kubectl get hpa -n humor-game
+
+verify-all: verify test-endpoints check-resources ## Run complete verification suite
+	@echo ""
+	@echo "✅ Verification complete!"
+
+##@ 🧹 Cleanup Commands
+
+clean-app: ## Remove application components
+	@echo "🧹 Cleaning application..."
+	kubectl delete namespace humor-game --ignore-not-found=true
+	@echo "✅ Application cleaned!"
+
+clean-monitoring: ## Remove monitoring stack
+	@echo "🧹 Cleaning monitoring stack..."
+	kubectl delete namespace monitoring --ignore-not-found=true
+	@echo "✅ Monitoring stack cleaned!"
+
+clean-gitops: ## Remove ArgoCD
+	@echo "🧹 Cleaning ArgoCD..."
+	kubectl delete namespace argocd --ignore-not-found=true
+	@echo "✅ ArgoCD cleaned!"
+
+clean-ingress: ## Remove ingress controller
+	@echo "🧹 Cleaning ingress controller..."
+	helm uninstall ingress-nginx -n ingress-nginx || true
+	kubectl delete namespace ingress-nginx --ignore-not-found=true
+	@echo "✅ Ingress controller cleaned!"
+
+clean-cluster: ## Delete the entire k3d cluster
+	@echo "🧹 Deleting k3d cluster..."
+	k3d cluster delete dev-cluster
+	@echo "✅ Cluster deleted!"
+
+clean-all: clean-cluster ## Nuclear option - remove everything
+	@echo "💥 Everything cleaned! Run 'make deploy-all' to start over."
+
+##@ 🔧 Utility Commands
+
+logs-app: ## Show application logs
+	@echo "📋 Application Logs:"
+	kubectl logs -l app=backend -n humor-game --tail=50
+
+logs-monitoring: ## Show monitoring logs
+	@echo "📋 Monitoring Logs:"
+	kubectl logs -l app=prometheus -n monitoring --tail=20
+	kubectl logs -l app=grafana -n monitoring --tail=20
+
+logs-gitops: ## Show ArgoCD logs
+	@echo "📋 ArgoCD Logs:"
+	kubectl logs -l app.kubernetes.io/name=argocd-server -n argocd --tail=20
+
+port-forward-grafana: ## Port-forward to Grafana (localhost:3000)
+	@echo "📊 Port-forwarding to Grafana at http://localhost:3000"
+	@echo "📝 Login: admin/admin"
+	kubectl port-forward svc/grafana -n monitoring 3000:3000
+
+port-forward-prometheus: ## Port-forward to Prometheus (localhost:9090)
+	@echo "📈 Port-forwarding to Prometheus at http://localhost:9090"
+	kubectl port-forward svc/prometheus -n monitoring 9090:9090
+
+port-forward-argocd: ## Port-forward to ArgoCD (localhost:8090)
+	@echo "🔄 Port-forwarding to ArgoCD at http://localhost:8090"
+	@echo "📝 Get admin password with: kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d"
+	kubectl port-forward svc/argocd-server -n argocd 8090:443
+
+debug-pods: ## Show detailed pod information for troubleshooting
+	@echo "🔍 Pod Debug Information:"
+	@echo ""
+	@echo "🎮 Application Pods:"
+	kubectl describe pods -n humor-game
+	@echo ""
+	@echo "📊 Monitoring Pods:"
+	kubectl describe pods -n monitoring
+	@echo ""
+	@echo "🔄 ArgoCD Pods:"
+	kubectl describe pods -n argocd | head -50
+
+get-passwords: ## Show important passwords and access information
+	@echo "🔑 Access Information:"
+	@echo ""
+	@echo "🔄 ArgoCD Admin Password:"
+	@kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d && echo
+	@echo ""
+	@echo "📊 Grafana Access:"
+	@echo "  URL: http://localhost:3000 (with port-forward)"
+	@echo "  Username: admin"
+	@echo "  Password: admin"
+	@echo ""
+	@echo "🎮 Application URLs:"
+	@echo "  Local: http://gameapp.local:8080"
+	@echo "  Global: https://gameapp.games (if tunnel configured)"
+
+status: ## Show comprehensive system status
+	@echo "📊 System Status Overview:"
+	@echo ""
+	@echo "🔧 Cluster Info:"
+	kubectl cluster-info --context k3d-dev-cluster | head -3
+	@echo ""
+	@echo "📦 Namespaces:"
+	kubectl get namespaces | grep -E "(humor-game|monitoring|argocd|ingress-nginx)"
+	@echo ""
+	@echo "🏃 Running Pods:"
+	kubectl get pods --all-namespaces | grep -v "kube-system"
+	@echo ""
 	@echo "🌐 Services:"
-	kubectl get services -n humor-game
+	kubectl get svc --all-namespaces | grep -v "kube-system"
+
+##@ 📚 Learning Commands
+
+docs: ## Open documentation
+	@echo "📚 Opening documentation..."
+	@echo "🎯 Start here: docs/00-overview.md"
+	@echo "📖 Full guide: docs/README.md"
+
+tutorial: ## Show step-by-step learning path
+	@echo "🎓 Learning Path:"
 	@echo ""
-	@echo "📡 Ingress:"
-	kubectl get ingress -n humor-game
+	@echo "1️⃣  Prerequisites: docs/01-prereqs.md"
+	@echo "2️⃣  Docker Compose: docs/02-compose.md"
+	@echo "3️⃣  Kubernetes Basics: docs/03-k8s-basics.md"
+	@echo "4️⃣  Production Ingress: docs/04-ingress.md"
+	@echo "5️⃣  Observability: docs/05-observability.md"
+	@echo "6️⃣  GitOps: docs/06-gitops.md"
+	@echo "7️⃣  Global Production: docs/07-global.md"
 	@echo ""
-	@echo "💾 Persistent Volumes:"
-	kubectl get pvc -n humor-game
+	@echo "📝 Interview Prep: interviewprep.md"
+	@echo "📄 Blog Post: medium-blog-post.md"
 
-# Show application logs
-logs:
-	@echo "📝 Application Logs"
-	@echo "=================="
+examples: ## Show useful example commands
+	@echo "💡 Useful Example Commands:"
 	@echo ""
-	@echo "🔧 Backend logs:"
-	kubectl logs -n humor-game -l app=backend --tail=20
+	@echo "🔍 Debug failing pod:"
+	@echo "  kubectl describe pod POD_NAME -n humor-game"
+	@echo "  kubectl logs POD_NAME -n humor-game"
 	@echo ""
-	@echo "🎨 Frontend logs:"
-	kubectl logs -n humor-game -l app=frontend --tail=20
-
-# Run health checks
-test:
-	@echo "🧪 Running health checks..."
+	@echo "🧪 Test application:"
+	@echo "  curl -H 'Host: gameapp.local' http://localhost:8080/api/health"
+	@echo "  curl -H 'Host: gameapp.local' http://localhost:8080/api/leaderboard"
 	@echo ""
-	@echo "🏥 Backend health:"
-	curl -s http://localhost:3001/health || echo "❌ Backend not accessible"
+	@echo "📊 Monitor resources:"
+	@echo "  kubectl top nodes"
+	@echo "  kubectl top pods -n humor-game"
 	@echo ""
-	@echo "🎮 Frontend health:"
-	curl -s http://localhost:8080/ | head -5 || echo "❌ Frontend not accessible"
-	@echo ""
-	@echo "🗄️  Database connection:"
-	kubectl exec -n humor-game deployment/postgres -- pg_isready -U gameuser || echo "❌ Database not accessible"
-
-# Setup k3d cluster
-setup-k3d:
-	@echo "🏗️  Creating k3d cluster..."
-	k3d cluster create humor-game-cluster \
-		--servers 1 \
-		--agents 2 \
-		--port 8080:80@loadbalancer \
-		--port 8443:443@loadbalancer \
-		--k3s-arg '--disable=traefik@server:*' \
-		--registry-use k3d-k3d-registry:5000
-	@echo "✅ k3d cluster created"
-
-# Setup local registry
-setup-registry:
-	@echo "📦 Creating local Docker registry..."
-	docker run -d --restart=always -p 5001:5000 --name k3d-registry registry:2
-	@echo "✅ Local registry created at localhost:5001"
-
-# Setup port forwarding
-port-forward:
-	@echo "🔌 Setting up port forwarding..."
-	@echo "🌐 Frontend: http://localhost:8080"
-	@echo "🔧 Backend: http://localhost:3001"
-	@echo "📊 Prometheus: http://localhost:9090"
-	@echo "📈 Grafana: http://localhost:3000"
-	@echo ""
-	@echo "Run these commands in separate terminals:"
-	@echo "kubectl port-forward -n humor-game service/frontend 8080:80"
-	@echo "kubectl port-forward -n humor-game service/backend 3001:3001"
-	@echo "kubectl port-forward -n monitoring service/prometheus 9090:9090"
-	@echo "kubectl port-forward -n monitoring service/grafana 3000:3000"
-
-# Clean up deployments
-clean:
-	@echo "🧹 Cleaning up deployments..."
-	kubectl delete -f k8s/ingress.yaml --ignore-not-found=true
-	kubectl delete -f k8s/frontend.yaml --ignore-not-found=true
-	kubectl delete -f k8s/backend.yaml --ignore-not-found=true
-	kubectl delete -f k8s/redis.yaml --ignore-not-found=true
-	kubectl delete -f k8s/postgres.yaml --ignore-not-found=true
-	kubectl delete -f k8s/configmap.yaml --ignore-not-found=true
-	kubectl delete -f k8s/namespace.yaml --ignore-not-found=true
-	@echo "✅ Cleanup complete"
-
-# Clean up Docker images
-clean-images:
-	@echo "🗑️  Cleaning up Docker images..."
-	docker rmi localhost:5001/humor-game-backend:latest || true
-	docker rmi localhost:5001/humor-game-frontend:latest || true
-	@echo "✅ Images cleaned"
-
-# Complete reset
-reset: clean clean-images
-	@echo "🔄 Resetting cluster..."
-	k3d cluster delete humor-game-cluster || true
-	docker stop k3d-registry || true
-	docker rm k3d-registry || true
-	@echo "✅ Complete reset done"
-
-# Quick start (build, push, deploy)
-quick-start: build-push deploy
-	@echo "🚀 Quick start complete!"
-	@echo "🌐 Access your app: http://localhost:8080"
-
-# Production deployment
-production: build-push deploy-prod deploy-mon deploy-argo deploy-cf
-	@echo "🏭 Production deployment complete!"
-	@echo "🌐 Access your app: https://gameapp.games"
+	@echo "🔄 Force pod restart:"
+	@echo "  kubectl rollout restart deployment/backend -n humor-game"
