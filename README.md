@@ -284,7 +284,7 @@ Special thanks to the open-source community and the maintainers of:
 
 ![GitHub stars](https://img.shields.io/github/stars/yourusername/humor-memory-game?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/yourusername/humor-memory-game?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/humor-memory-game)
+![GitHub downloads](https://img.shields.io/github/downloads/yourusername/humor-memory-game/total?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/humor-memory-game)
 
 **📊 Learning Impact**: 1000+ developers trained • 50+ companies using in production • 95% positive feedback
