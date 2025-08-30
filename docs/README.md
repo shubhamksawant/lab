@@ -133,7 +133,7 @@ kubectl get pods -n argocd
 - 🐛 **Found a bug?** → [Open GitHub Issue](https://github.com/yourusername/humor-memory-game/issues)
 - 💬 **Have questions?** → [GitHub Discussions](https://github.com/yourusername/humor-memory-game/discussions)
 - 📖 **Need clarification?** → Check [FAQ](09-faq.md) or [Glossary](10-glossary.md)
-- 🎓 **Want to contribute?** → See [Contributing Guidelines](../CONTRIBUTING.md)
+- 🎓 **Want to contribute?** → See [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues)
 
 ### **🚨 Emergency Troubleshooting**
 1. **Pods won't start**: Check [Troubleshooting Guide](08-troubleshooting.md#pod-issues)
@@ -230,7 +230,7 @@ We welcome contributions to improve these guides! Here's how you can help:
 - Improve security recommendations
 - Optimize performance suggestions
 
-**📋 See**: [Contributing Guidelines](../CONTRIBUTING.md) for detailed instructions
+**📋 See**: [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues) for detailed instructions
 
 ---
 

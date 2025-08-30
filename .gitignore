@@ -32,6 +32,7 @@ medium-blog-post.md
 # Legacy documentation files (replaced by enhanced docs/)
 homelab.md
 home-lab-bk.md
+fix_code_blocks.py
 # ========================================
 # FRONTEND
 # ========================================
