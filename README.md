@@ -31,7 +31,7 @@
 ### **Option 2: Fast Deploy (For Experienced Users)**
 ```bash
 # Deploy everything at once
-git clone https://github.com/yourusername/humor-memory-game
+git clone https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
 cd humor-memory-game
 make deploy-all
 
@@ -218,8 +218,8 @@ k3d cluster delete dev-cluster
 ## 🆘 **Getting Help**
 
 ### **📞 Support Channels**
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues)
-- 💬 **Questions**: [GitHub Discussions](https://github.com/yourusername/humor-memory-game/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/Osomudeya/humor-memory-game/issues)
+- 💬 **Questions**: [GitHub Discussions](https://github.com/Osomudeya/humor-memory-game/discussions)
 - 📖 **Documentation**: [Troubleshooting Guide](docs/08-troubleshooting.md)
 - 🎓 **Learning**: [FAQ Section](docs/09-faq.md)
 
@@ -237,16 +237,6 @@ k3d cluster delete dev-cluster
 
 ---
 
-## 🌟 **Success Stories**
-
-> *"This project helped me land my first DevOps role! The interview prep guide was incredibly valuable."* - **Sarah K., DevOps Engineer**
-
-> *"Finally understand Kubernetes networking and monitoring. Best hands-on tutorial I've found."* - **Mike R., Software Developer**
-
-> *"Used this as a foundation for our startup's infrastructure. Saved months of research and experimentation."* - **Alex T., CTO**
-
----
-
 ## 🤝 **Contributing**
 
 We welcome contributions! Here's how you can help:
@@ -257,7 +247,7 @@ We welcome contributions! Here's how you can help:
 - 🔧 **Add new features** or troubleshooting guides
 - ⭐ **Star the repository** to show support
 
-**📋 See**: [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues) for bug reports and feature requests
+**📋 See**: [GitHub Issues](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git/issues) for bug reports and feature requests
 
 ---
 
@@ -280,10 +270,10 @@ Special thanks to the open-source community and the maintainers of:
 
 ## 📈 **Project Stats**
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/humor-memory-game?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/humor-memory-game?style=social)
-![GitHub downloads](https://img.shields.io/github/downloads/yourusername/humor-memory-game/total?style=social)
-![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/humor-memory-game)
+![GitHub stars](https://img.shields.io/github/stars/Osomudeya/humor-memory-game?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Osomudeya/humor-memory-game?style=social)
+![GitHub downloads](https://img.shields.io/github/downloads/Osomudeya/humor-memory-game/total?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/Osomudeya/humor-memory-game)
 
 **📊 Learning Impact**: 1000+ developers trained • 50+ companies using in production • 95% positive feedback
 
