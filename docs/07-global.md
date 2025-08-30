@@ -30,6 +30,7 @@ This milestone will teach you how to:
 # Verify your current setup from previous milestones
 curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
 # Should return: {"status":"healthy"}
+```
 
 **Expected Output:**
 ```json
@@ -44,12 +45,14 @@ curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
 }
 ```
 
+```bash
 # Test game functionality
 open http://gameapp.local:8080
 
 # Add resource monitoring
 kubectl top nodes
 kubectl top pods -n humor-game
+```
 
 **Expected Output:**
 ```bash
@@ -64,7 +67,6 @@ humor-game-frontend-8e9f0d1e2f-def34   5m            45Mi
 humor-game-postgres-7d8f9c8f9c-abc12   8m            89Mi
 humor-game-redis-8e9f0d1e2f-def34      3m            23Mi
 ```
-```
 
 ### Step 2: Implement Resource Limits and Requests
 
@@ -74,6 +76,7 @@ humor-game-redis-8e9f0d1e2f-def34      3m            23Mi
 # Verify resources are applied (they're already there from previous milestones)
 kubectl describe deployment backend -n humor-game | grep -A 10 "Limits\|Requests"
 kubectl describe deployment frontend -n humor-game | grep -A 10 "Limits\|Requests"
+```
 
 **Expected Output:**
 ```bash
@@ -83,7 +86,6 @@ kubectl describe deployment frontend -n humor-game | grep -A 10 "Limits\|Request
     Requests:
       cpu:     100m
       memory:  128Mi
-```
 ```
 
 ### Step 3: Set Up Cloudflare Tunnel for Global Access 🌍
@@ -311,6 +313,7 @@ Cloudflare tunnels provide:
 ```bash
 # Install cert-manager for automatic TLS certificates
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+```
 
 **Expected Output:**
 ```bash
@@ -335,6 +338,7 @@ kubectl apply -f k8s/cluster-issuer.yaml
 # Verify certificate is issued
 kubectl get certificate -n humor-game
 kubectl describe certificate game-tls -n humor-game
+```
 
 **Expected Output:**
 ```bash
@@ -343,7 +347,7 @@ game-tls   True    game-tls   5m
 ```
 
 **Certificate Details:**
-```
+```yaml
 Name:         game-tls
 Namespace:    humor-game
 Labels:       <none>
@@ -362,7 +366,6 @@ Status:
     Reason:                Ready
     Status:                True
     Type:                  Ready
-```
 ```
 
 ### Step 5: Implement Health Checks and Monitoring
@@ -430,7 +433,7 @@ curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
 ## You Should See...
 
 **Resource Limits Applied:**
-```
+```yaml
 Limits:
   cpu:     500m
   memory:  256Mi
@@ -440,14 +443,14 @@ Requests:
 ```
 
 **HPA Status:**
-```
+```bash
 NAME           REFERENCE             TARGETS                                     MINPODS   MAXPODS   REPLICAS   AGE
 backend-hpa    Deployment/backend    cpu: <unknown>/70%, memory: <unknown>/80%   1         5         1          14s
 frontend-hpa   Deployment/frontend   cpu: <unknown>/70%                          1         3         1          14s
 ```
 
 **Network Policies:**
-```
+```bash
 NAME                      POD-SELECTOR   AGE
 backend-network-policy    app=backend    56s
 database-network-policy   app=postgres   56s
@@ -456,7 +459,7 @@ redis-network-policy      app=redis      56s
 ```
 
 **Monitoring Stack:**
-```
+```bash
 NAME                       READY   STATUS    RESTARTS   AGE
 prometheus-7c8b7c8b7c8b   1/1     Running   0          15m
 grafana-9d8e7d6c5b-def34  1/1     Running   0          20m
