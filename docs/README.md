@@ -6,6 +6,12 @@
 [![Beginner Friendly](https://img.shields.io/badge/Beginner-Friendly-blue?style=for-the-badge)](./01-prereqs.md)
 [![Production Ready](https://img.shields.io/badge/Production-Ready-red?style=for-the-badge)](./07-global.md)
 
+## 🎮 **Application Preview**
+
+![Humor Memory Game Interface](../assets/images/hga.jpg)
+
+*The Humor Memory Game: A DevOps Learning Adventure! - A web-based memory game featuring a 4x4 grid of cards, game statistics, and navigation tabs for Game, Leaderboard, My Stats, and About.*
+
 ---
 
 ## 🎯 **Quick Navigation**
