@@ -10,11 +10,9 @@
 ---
 
 ## 🌟 **Live Demo**
+![Humor Memory Game Interface](assets/images/hga.jpg)
 
-🎮 **Game Application**: [https://gameapp.games](https://gameapp.games)  
-📊 **Monitoring Dashboard**: [https://grafana.gameapp.games](https://grafana.gameapp.games) (admin/admin)  
-📈 **Metrics Collection**: [https://prometheus.gameapp.games](https://prometheus.gameapp.games)  
-🔄 **GitOps Management**: [https://argocd.gameapp.games](https://argocd.gameapp.games)
+*Experience the Humor Memory Game: A DevOps Learning Adventure! - A web-based memory game featuring a 4x4 grid of cards, game statistics, and navigation tabs for Game, Leaderboard, My Stats, and About.*
 
 ---
 
