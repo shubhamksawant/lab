@@ -23,7 +23,7 @@
 ### **Option 1: Complete Learning Path (Recommended for Beginners)**
 ```bash
 # 1. Install prerequisites
-./scripts/install-prereqs.sh
+# Follow the guide: docs/01-prereqs.md
 
 # 2. Follow step-by-step guides
 # Start with: docs/01-prereqs.md
@@ -139,7 +139,7 @@ curl http://localhost:3001/api/health
 ### **🎯 Career Development**
 - **[🎤 Interview Prep Guide](interviewprep.md)** - Technical interview preparation
 - **[📝 Medium Blog Post](medium-blog-post.md)** - Professional project writeup
-- **[📊 Architecture Diagrams](docs/architecture/)** - Visual system documentation
+- **[📊 Architecture Overview](docs/00-overview.md#architecture-overview)** - Visual system documentation
 
 ---
 
@@ -259,13 +259,13 @@ We welcome contributions! Here's how you can help:
 - 🔧 **Add new features** or troubleshooting guides
 - ⭐ **Star the repository** to show support
 
-**📋 See**: [Contributing Guidelines](CONTRIBUTING.md)
+**📋 See**: [GitHub Issues](https://github.com/yourusername/humor-memory-game/issues) for bug reports and feature requests
 
 ---
 
 ## 📄 **License**
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License. See the project repository for license details.
 
 ---
 
