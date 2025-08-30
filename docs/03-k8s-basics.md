@@ -22,6 +22,11 @@ k3d cluster create dev-cluster \
   --agents 2 \
   --port "8080:80@loadbalancer" \
   --port "8443:443@loadbalancer"
+  OR
+
+  k3d cluster create dev-cluster --servers 1 --agents 2 --port "8080:80@loadbalancer" --port "8443:443@loadbalancer" --k3s-arg --disable=traefik@server:0
+
+  OR apply the k3d-config.yaml file
 ```
 
 **Expected Output:**
@@ -236,7 +241,7 @@ humor-game-frontend-7d8f9c8f9c-abc12   1/1     Running   0          2m
 
 ```bash
 # Test backend API through port-forward
-kubectl port-forward service/humor-game-backend 3001:3001 -n humor-game &
+kubectl port-forward service/backend 3001:3001 -n humor-game &
 ```
 
 **Expected Output:**
@@ -263,7 +268,7 @@ curl http://localhost:3001/health
 
 ```bash
 # Test frontend through port-forward
-kubectl port-forward service/humor-game-frontend 3000:80 -n humor-game &
+kubectl port-forward service/frontend 3000:80 -n humor-game &
 ```
 
 **Expected Output:**
@@ -316,7 +321,7 @@ Your Kubernetes application is working when:
 **Fix:**
 ```bash
 # Check pod events for specific errors
-kubectl describe pod humor-game-backend-xxx -n humor-game
+kubectl describe pod backend-xxx -n humor-game
 
 # Common fix: Ensure images are imported to k3d
 k3d image import humor-game-backend:latest -c dev-cluster
@@ -329,13 +334,13 @@ k3d image import humor-game-frontend:latest -c dev-cluster
 **Fix:**
 ```bash
 # Check pod logs for errors
-kubectl logs humor-game-backend-xxx -n humor-game
+kubectl logs backend-xxx -n humor-game
 
 # Verify secrets and configmaps exist
 kubectl get secrets,configmap -n humor-game
 
 # Restart the deployment
-kubectl rollout restart deployment/humor-game-backend -n humor-game
+kubectl rollout restart deployment/backend -n humor-game
 ```
 
 ### Symptom: Database connection failed
@@ -347,7 +352,7 @@ kubectl rollout restart deployment/humor-game-backend -n humor-game
 kubectl logs humor-game-postgres-xxx -n humor-game
 
 # Verify service is accessible
-kubectl exec -it humor-game-backend-xxx -n humor-game -- env | grep DB_HOST
+kubectl exec -it backend-xxx -n humor-game -- env | grep DB_HOST
 
 # Wait longer for database initialization
 kubectl wait --for=condition=ready pod -l app=postgres -n humor-game --timeout=300s
@@ -368,9 +373,72 @@ kubectl get pods -l app=backend -n humor-game
 kubectl exec -it humor-game-frontend-xxx -n humor-game -- curl http://humor-game-backend:3001/health
 ```
 
+### Symptom: Network connectivity issues between k3d nodes
+**Cause:** Cluster network configuration problems or node communication failures
+**Command to confirm:** `kubectl logs <pod-name> -n humor-game` shows "proxy error" or "502 Bad Gateway"
+**Fix:**
+```bash
+# Check cluster node status
+kubectl get nodes -o wide
+
+# If nodes show Ready but pods can't communicate, recreate cluster
+k3d cluster delete dev-cluster
+k3d cluster create dev-cluster --servers 1 --agents 2 --port "8080:80@loadbalancer" --port "8443:443@loadbalancer" --k3s-arg --disable=traefik@server:0
+
+# Redeploy all components
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secrets.yaml
+kubectl apply -f k8s/postgres.yaml
+kubectl apply -f k8s/redis.yaml
+```
+
+### Symptom: Frontend nginx proxy not routing API calls to backend
+**Cause:** Missing nginx proxy configuration for `/api/*` endpoints
+**Command to confirm:** `curl http://localhost:3000/api/health` returns 404 or frontend shows "Cannot connect to game server"
+**Fix:**
+```bash
+# Update frontend nginx.conf to include API proxy
+# Add this location block to nginx.conf:
+location /api/ {
+    proxy_pass http://backend:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# Rebuild and redeploy frontend
+docker build -t humor-game-frontend:latest ./frontend
+k3d image import humor-game-frontend:latest -c dev-cluster
+kubectl rollout restart deployment/frontend -n humor-game
+```
+
+### Symptom: Service names mismatch between deployment and port-forward
+**Cause:** Services created with different names than expected (e.g., `backend` vs `humor-game-backend`)
+**Command to confirm:** `kubectl get svc -n humor-game` shows different service names
+**Fix:**
+```bash
+# Check actual service names
+kubectl get svc -n humor-game
+
+# Use correct service names for port-forward
+kubectl port-forward service/backend 3001:3001 -n humor-game &
+kubectl port-forward service/frontend 3000:80 -n humor-game &
+
+# Or update service names in YAML files to match expectations
+```
+
 ## 💡 **Reset/Rollback Commands**
 
 If you need to start over or fix issues:
+
+**Common Error Messages & Solutions:**
+- **"Error from server (NotFound): services 'humor-game-backend' not found"** → Use actual service names: `backend`, `frontend`
+- **"proxy error from 127.0.0.1:6443 while dialing 172.18.0.5:10250, code 502"** → Recreate cluster due to network issues
+- **"Cannot connect to game server" in frontend** → Missing nginx API proxy configuration
+- **"connect ECONNREFUSED 10.43.x.x:5432"** → Database not ready, wait for postgres pod
 
 ```bash
 # Delete all resources in the namespace
@@ -380,15 +448,15 @@ kubectl delete namespace humor-game
 kubectl apply -f k8s/namespace.yaml
 
 # Restart specific deployment
-kubectl rollout restart deployment/humor-game-backend -n humor-game
+kubectl rollout restart deployment/backend -n humor-game
 
 # Scale deployment down and up
-kubectl scale deployment humor-game-backend --replicas=0 -n humor-game
-kubectl scale deployment humor-game-backend --replicas=1 -n humor-game
+kubectl scale deployment backend --replicas=0 -n humor-game
+kubectl scale deployment hbackend --replicas=1 -n humor-game
 
 # View logs for troubleshooting
-kubectl logs -f deployment/humor-game-backend -n humor-game
-kubectl logs -f deployment/humor-game-frontend -n humor-game
+kubectl logs -f deployment/backend -n humor-game
+kubectl logs -f deployment/frontend -n humor-game
 ```
 
 ## Clean Up Before Moving Forward
