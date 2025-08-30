@@ -4,17 +4,17 @@ metadata:
   name: humor-game-ingress
   namespace: humor-game
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - gameapp.games  # Production domain with SSL
-    secretName: gameapp-prod-tls
+  # tls:
+  # - hosts:
+  #   - gameapp.games  # Production domain with SSL
+  #   secretName: gameapp-prod-tls
   rules:
     - host: gameapp.local  # For local development (no SSL)
       http:
@@ -57,47 +57,47 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: gameapp.games  # For production (with SSL)
-      http:
-        paths:
-          # API routes - forward to backend
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          # Backend endpoints - forward to backend
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          - path: /metrics
-            pathType: Exact
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          - path: /debug
-            pathType: Prefix
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 3001
-          # Everything else - serve from frontend
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
+    # - host: gameapp.games  # For production (with SSL)
+    #   http:
+    #     paths:
+    #       # API routes - forward to backend
+    #       - path: /api
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: backend
+    #             port:
+    #               number: 3001
+    #       # Backend endpoints - forward to backend
+    #       - path: /health
+    #         pathType: Exact
+    #         backend:
+    #           service:
+    #             name: backend
+    #             port:
+    #               number: 3001
+    #       - path: /metrics
+    #         pathType: Exact
+    #         backend:
+    #           service:
+    #             name: backend
+    #             port:
+    #               number: 3001
+    #       - path: /debug
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: backend
+    #             port:
+    #               number: 3001
+    #       # Everything else - serve from frontend
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: frontend
+    #             port:
+    #               number: 80
 
 ---
 # ArgoCD Ingress for GitOps management
@@ -107,19 +107,19 @@ metadata:
   name: argocd-ingress
   namespace: argocd
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     # ArgoCD server configuration for UI access
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - argocd.gameapp.games  # Production ArgoCD with SSL
-    secretName: argocd-prod-tls
+  # tls:
+  # - hosts:
+  #   - argocd.gameapp.games  # Production ArgoCD with SSL
+  #   secretName: argocd-prod-tls
   rules:
     - host: argocd.gameapp.local  # Local ArgoCD access (no SSL)
       http:
@@ -131,14 +131,14 @@ spec:
                 name: argocd-server
                 port:
                   number: 80
-    - host: argocd.gameapp.games  # Production ArgoCD access (with SSL)
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
+    # - host: argocd.gameapp.games  # Production ArgoCD access (with SSL)
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: argocd-server
+    #             port:
+    #               number: 80
 
