@@ -32,7 +32,7 @@
 ```bash
 # Deploy everything at once
 git clone https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
-cd humor-memory-game
+cd DevOps-Home-Lab-2025
 make deploy-all
 
 # Verify deployment
@@ -218,8 +218,8 @@ k3d cluster delete dev-cluster
 ## 🆘 **Getting Help**
 
 ### **📞 Support Channels**
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/Osomudeya/humor-memory-game/issues)
-- 💬 **Questions**: [GitHub Discussions](https://github.com/Osomudeya/humor-memory-game/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/Osomudeya/DevOps-Home-Lab-2025/issues)
+- 💬 **Questions**: [GitHub Discussions](https://github.com/Osomudeya/DevOps-Home-Lab-2025/discussions)
 - 📖 **Documentation**: [Troubleshooting Guide](docs/08-troubleshooting.md)
 - 🎓 **Learning**: [FAQ Section](docs/09-faq.md)
 
@@ -270,10 +270,10 @@ Special thanks to the open-source community and the maintainers of:
 
 ## 📈 **Project Stats**
 
-![GitHub stars](https://img.shields.io/github/stars/Osomudeya/humor-memory-game?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Osomudeya/humor-memory-game?style=social)
-![GitHub downloads](https://img.shields.io/github/downloads/Osomudeya/humor-memory-game/total?style=social)
-![GitHub last commit](https://img.shields.io/github/last-commit/Osomudeya/humor-memory-game)
+![GitHub stars](https://img.shields.io/github/stars/Osomudeya/DevOps-Home-Lab-2025?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Osomudeya/DevOps-Home-Lab-2025?style=social)
+![GitHub downloads](https://img.shields.io/github/downloads/Osomudeya/DevOps-Home-Lab-2025/total?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/Osomudeya/DevOps-Home-Lab-2025)
 
 **📊 Learning Impact**: 1000+ developers trained • 50+ companies using in production • 95% positive feedback
 
