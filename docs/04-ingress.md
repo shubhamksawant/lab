@@ -1,4 +1,4 @@
-# Milestone 3: Ingress & External Access
+# Milestone 4: Ingress & External Access
 
 ## 🎯 **Goal**
 Set up an Ingress Controller to route external traffic to your Kubernetes services, enabling production-style domain access to your application.
@@ -18,9 +18,10 @@ An Ingress Controller acts like nginx in Docker Compose, routing external traffi
 ```bash
 # Install nginx-ingress controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/baremetal/deploy.yaml
+```
 
 **Expected Output:**
-```
+```bash
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
 configmap/ingress-nginx-controller created
@@ -34,28 +35,58 @@ deployment.apps/ingress-nginx-controller created
 validatingwebhookconfiguration.admissionregistration.k8s.io/ingress-nginx-admission created
 ```
 
+```bash
 # Wait for ingress controller to be ready
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=120s
+```
 
+**Expected Output:**
+```bash
+pod/ingress-nginx-controller-xxx condition met
+```
+
+```bash
+# Configure ingress controller to use hostPorts for k3d compatibility
+kubectl patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","ports":[{"containerPort":80,"hostPort":80,"name":"http","protocol":"TCP"},{"containerPort":443,"hostPort":443,"name":"https","protocol":"TCP"},{"containerPort":8443,"name":"webhook","protocol":"TCP"}]}]}}}}'
+```
+
+**Expected Output:**
+```bash
+deployment.apps/ingress-nginx-controller patched
+```
+
+```bash
+# Wait for deployment rollout to complete
+kubectl rollout status deployment/ingress-nginx-controller -n ingress-nginx
+```
+
+**Expected Output:**
+```bash
+deployment "ingress-nginx-controller" successfully rolled out
+```
+
+```bash
 # Deploy your application's ingress rules
 kubectl apply -f k8s/ingress.yaml
+```
 
 **Expected Output:**
-```
-ingress.networking.k8s.io/humor-game-ingress created
+```bash
+ingress.networking.k8s.io/humor-game-ingress configured
 ```
 
+```bash
 # Verify ingress is configured
 kubectl get ingress -n humor-game
+```
 
 **Expected Output:**
-```
-NAME               CLASS                HOSTS           ADDRESS   PORTS   AGE
-humor-game-ingress   humor-game-nginx   gameapp.local   80        2m
-```
+```bash
+NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
+humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      2m
 ```
 
 ### Step 2: Configure Local Domain and Test Access
@@ -64,46 +95,71 @@ humor-game-ingress   humor-game-nginx   gameapp.local   80        2m
 ```bash
 # Add local domain to your hosts file
 echo "127.0.0.1 gameapp.local" | sudo tee -a /etc/hosts
+```
 
 **Expected Output:**
-```
+```bash
 127.0.0.1 gameapp.local
 ```
 
+```bash
 # Verify DNS resolution works
 ping gameapp.local
 # Should ping 127.0.0.1 successfully
+```
 
 **Expected Output:**
-```
+```bash
 PING gameapp.local (127.0.0.1): 56 data bytes
-64 bytes from 127.0.0.1: icmp_seq=1 time=0.037 ms
-64 bytes from 127.0.0.1: icmp_seq=2 time=0.034 ms
-64 bytes from 127.0.0.1: icmp_seq=3 time=0.033 ms
+64 bytes from gameapp.local (127.0.0.1): icmp_seq=1 time=0.037 ms
+64 bytes from gameapp.local (127.0.0.1): icmp_seq=2 time=0.034 ms
+64 bytes from gameapp.local (127.0.0.1): icmp_seq=3 time=0.033 ms
 --- gameapp.local ping statistics ---
-3 packets transmitted, 3 packets received, 0.0% packet loss
-```
+3 packets transmitted, 3 received, 0% packet loss
 ```
 
 **Test your Kubernetes application:**
 ```bash
+# Test frontend through Ingress
+curl -H "Host: gameapp.local" -I http://localhost:8080/
+```
+
+**Expected Output:**
+```bash
+HTTP/1.1 200 OK
+Date: Sat, 30 Aug 2025 00:33:20 GMT
+Content-Type: text/html
+Content-Length: 16910
+Connection: keep-alive
+Last-Modified: Sat, 30 Aug 2025 00:01:16 GMT
+ETag: "68b23f4c-420e"
+Expires: Sat, 30 Aug 2025 00:38:20 GMT
+Cache-Control: max-age=300
+Cache-Control: public, must-revalidate
+Accept-Ranges: bytes
+```
+
+```bash
 # Test API health through Ingress
 curl -H "Host: gameapp.local" http://localhost:8080/api/health
-# Should return: {"status":"healthy",...}
+```
 
 **Expected Output:**
 ```json
 {
   "status": "healthy",
+  "timestamp": "2025-08-30T00:33:26.867Z",
   "services": {
     "database": "connected",
-    "redis": "connected"
+    "redis": "connected",
+    "api": "running"
   },
-  "timestamp": "2024-01-15T10:30:00.000Z",
-  "uptime": "00:05:23"
+  "version": "1.0.0",
+  "environment": "development"
 }
 ```
 
+```bash
 # Open in browser with domain
 open http://gameapp.local:8080
 ```
@@ -113,27 +169,33 @@ open http://gameapp.local:8080
 ```bash
 # Check ingress status
 kubectl get ingress -n humor-game
-# Should show: humor-game-ingress with humor-game-nginx class
+# Should show: humor-game-ingress with nginx class
+```
 
 **Expected Output:**
-```
-NAME               CLASS                HOSTS           ADDRESS   PORTS   AGE
-humor-game-ingress   humor-game-nginx   gameapp.local   80        88m
+```bash
+NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
+humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      13m
 ```
 
+```bash
 # Check ingress controller pods
 kubectl get pods -n ingress-nginx
 # Should show: nginx-ingress-controller pod with "1/1 Running"
+```
 
 **Expected Output:**
-```
-NAME                                       READY   STATUS    RESTARTS   AGE
-nginx-ingress-controller-7c8b7c8b7c8b    1/1     Running   0          88m
+```bash
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-md6pr        0/1     Completed   0          23m
+ingress-nginx-admission-patch-b2rx9         0/1     Completed   0          23m
+ingress-nginx-controller-5445788fcd-qn4x2   1/1     Running     0          73s
 ```
 
+```bash
 # Verify ingress rules
 kubectl describe ingress humor-game-ingress -n humor-game
-# Should show rules for gameapp.local and gameapp.games
+# Should show rules for gameapp.local
 ```
 
 ### Step 4: Test Full Application Functionality
@@ -142,56 +204,57 @@ kubectl describe ingress humor-game-ingress -n humor-game
 # Test frontend loads
 curl -H "Host: gameapp.local" -I http://localhost:8080/
 # Should return: HTTP/1.1 200 OK
+```
 
 **Expected Output:**
-```
+```bash
 HTTP/1.1 200 OK
-Server: nginx/1.25.3
+Date: Sat, 30 Aug 2025 00:33:20 GMT
 Content-Type: text/html
-Content-Length: 1234
-Date: Mon, 15 Jan 2024 10:30:00 GMT
+Content-Length: 16910
+Connection: keep-alive
+Last-Modified: Sat, 30 Aug 2025 00:01:16 GMT
+ETag: "68b23f4c-420e"
+Expires: Sat, 30 Aug 2025 00:38:20 GMT
+Cache-Control: max-age=300
+Cache-Control: public, must-revalidate
+Accept-Ranges: bytes
 ```
 
+```bash
 # Test API endpoints
 curl -H "Host: gameapp.local" http://localhost:8080/api/health
 # Should return: {"status":"healthy",...}
-
-# Test static assets
-curl -H "Host: gameapp.local" -I http://localhost:8080/scripts/game.js
-# Should return: Content-Type: application/javascript
-
-**Expected Output:**
 ```
-HTTP/1.1 200 OK
-Server: nginx/1.25.3
-Content-Type: application/javascript
-Content-Length: 5678
-Date: Mon, 15 Jan 2024 10:30:00 GMT
-```
+
+```bash
+# Test metrics endpoint
+curl -H "Host: gameapp.local" http://localhost:8080/metrics
+# Should return Prometheus metrics
 ```
 
 ## You Should See...
 
 **Ingress Status:**
-```
-NAME               CLASS                HOSTS           ADDRESS   PORTS   AGE
-humor-game-ingress   humor-game-nginx   gameapp.local   80        88m
+```bash
+NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
+humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      13m
 ```
 
 **Ingress Controller Status:**
-```
-NAME                                       READY   STATUS    RESTARTS   AGE
-nginx-ingress-controller-7c8b7c8b7c8b    1/1     Running   0          88m
+```bash
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-controller-5445788fcd-qn4x2   1/1     Running     0          73s
 ```
 
 **Host Resolution:**
-```
+```bash
 PING gameapp.local (127.0.0.1): 56 data bytes
-64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.045 ms
+64 bytes from gameapp.local (127.0.0.1): icmp_seq=1 time=0.037 ms
 ```
 
 **Frontend Response:**
-```
+```bash
 HTTP/1.1 200 OK
 Content-Type: text/html
 ```
@@ -202,9 +265,10 @@ Content-Type: text/html
   "status": "healthy",
   "services": {
     "database": "connected",
-    "redis": "connected"
+    "redis": "connected",
+    "api": "running"
   },
-  "timestamp": "2024-08-21T10:00:00.000Z"
+  "timestamp": "2025-08-30T00:33:26.867Z"
 }
 ```
 
@@ -212,9 +276,8 @@ Content-Type: text/html
 
 Your Ingress setup is working when:
 - ✅ Ingress controller pods are running in ingress-nginx namespace
-- ✅ Ingress rules are configured for gameapp.local and gameapp.games
+- ✅ Ingress rules are configured for gameapp.local
 - ✅ Frontend loads at `http://gameapp.local:8080` through Ingress
-- ✅ You can start a game and play without errors
 - ✅ Backend API responds to health checks through Ingress
 - ✅ Ingress routes traffic correctly to both frontend and backend
 
@@ -236,50 +299,34 @@ k3d cluster delete dev-cluster
 k3d cluster create dev-cluster --servers 1 --agents 1 --k3s-arg --disable=traefik@server:0
 ```
 
-### Symptom: Ingress not routing /api/* requests to backend
-**Cause:** Ingress routing correct but backend missing /api/* routes
-**Command to confirm:** `curl -H "Host: gameapp.local" -s http://localhost:8080/api/health`
+### Symptom: Ingress not accessible through k3d load balancer
+**Cause:** Ingress controller not configured with hostPorts for k3d compatibility
+**Command to confirm:** `curl -H "Host: gameapp.local" -I http://localhost:8080/`
 **Fix:**
 ```bash
-# Problem: Ingress routing correct but backend missing /api/* routes
-# Error: {"error":"Not Found","message":"API endpoint not found! 🔍"}
+# Configure ingress controller to use hostPorts
+kubectl patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","ports":[{"containerPort":80,"hostPort":80,"name":"http","protocol":"TCP"},{"containerPort":443,"hostPort":443,"name":"https","protocol":"TCP"},{"containerPort":8443,"name":"webhook","protocol":"TCP"}]}]}}}}'
 
-# Solution: Add /api/* routes to backend server.js
-# Fix: Ensure backend has app.get('/api/health', ...) and app.use('/api/*', ...)
+# Wait for rollout
+kubectl rollout status deployment/ingress-nginx-controller -n ingress-nginx
 
-# Verify fix:
-curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
-# Should return: {"status":"healthy",...}
+# Test again
+curl -H "Host: gameapp.local" -I http://localhost:8080/
 ```
 
-### Symptom: Frontend not loading correctly (static assets served as index.html)
-**Cause:** Frontend nginx catch-all location block overriding static asset paths
-**Command to confirm:** `curl -H "Host: gameapp.local" -I http://localhost:8080/scripts/game.js`
+### Symptom: SSL certificate errors in ingress controller logs
+**Cause:** Ingress configured with SSL but certificates don't exist
+**Command to confirm:** `kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller | grep "SSL"`
 **Fix:**
 ```bash
-# Problem: Frontend nginx catch-all location block overriding static asset paths
-# Solution: Reorder nginx location blocks with ^~ prefix matching
-# Fix: Update frontend/nginx.conf to prioritize /scripts/, /styles/, /components/
+# Comment out SSL configurations in k8s/ingress.yaml
+# Remove or comment: cert-manager.io/cluster-issuer, tls sections, ssl-redirect
 
-# Verify fix:
-curl -H "Host: gameapp.local" -I http://localhost:8080/scripts/game.js
-# Should return: Content-Type: application/javascript, not text/html
-```
+# Apply updated ingress
+kubectl apply -f k8s/ingress.yaml
 
-### Symptom: Backend Redis connection failing with malformed URL
-**Cause:** Kubernetes sets REDIS_PORT=tcp://host:port instead of just port
-**Command to confirm:** `kubectl logs -l app=backend -n humor-game | grep "Redis"`
-**Fix:**
-```bash
-# Problem: Kubernetes sets REDIS_PORT=tcp://host:port instead of just port
-# Error: redis://:password@redis:tcp://10.43.201.171:6379/0 (ERR_INVALID_URL)
-
-# Solution: Universal Redis connection logic for both environments
-# Fix: Update backend/utils/redis.js to handle tcp:// prefix in REDIS_PORT
-
-# Verify fix:
-kubectl logs -l app=backend -n humor-game | grep "Redis: Connected"
-# Should show: ✅ Redis: Connected and ready!
+# Check logs again
+kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller | grep "SSL"
 ```
 
 ## 💡 **Reset/Rollback Commands**
@@ -327,6 +374,7 @@ You've implemented production networking with Ingress routing:
 - **Traffic routing** from Ingress controller to appropriate services
 - **Production patterns** used by enterprise applications
 - **Domain management** for both development and production environments
+- **k3d compatibility** with hostPort configuration for ingress controllers
 
 ## Professional Skills Gained
 
@@ -334,6 +382,7 @@ You've implemented production networking with Ingress routing:
 - **Domain routing** and traffic management
 - **Production networking** patterns
 - **Service discovery** through external access points
+- **k3d cluster integration** with ingress controllers
 
 ---
 

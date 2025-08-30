@@ -21,15 +21,17 @@ cd /path/to/your/humor-memory-game
 
 # Build all container images
 docker-compose build
+```
 
 **Expected Output:**
-```
+```bash
 Building backend
 Step 1/12 : FROM node:18-alpine
 Step 1/12 : FROM node:18-alpine
  ---> 1234567890ab
 Step 2/12 : WORKDIR /app
  ---> Using cache
+Step 2/12 : WORKDIR /app
  ---> 1234567890ab
 ...
 Successfully built 1234567890ab
@@ -43,11 +45,13 @@ Successfully built 0987654321cd
 Successfully tagged game-app-laptop-demo-frontend:latest
 ```
 
+```bash
 # Start all services in background
 docker-compose up -d
+```
 
 **Expected Output:**
-```
+```bash
 Creating network "game-app-laptop-demo_default" ... done
 Creating game-app-laptop-demo_postgres_1 ... done
 Creating game-app-laptop-demo_redis_1 ... done
@@ -55,6 +59,7 @@ Creating game-app-laptop-demo_backend_1 ... done
 Creating game-app-laptop-demo_frontend_1 ... done
 ```
 
+```bash
 # Wait for services to initialize (databases need time to start)
 sleep 30
 ```
@@ -64,21 +69,15 @@ sleep 30
 ```bash
 # Check that all containers are running
 docker-compose ps
-
-# You should see 4 services running:
-# - postgres: Up, port 5432
-# - redis: Up, port 6379
-# - backend: Up, port 3001
-# - frontend: Up, port 80
+```
 
 **Expected Output:**
-```
+```bash
 NAME                       IMAGE                           STATUS                    PORTS
 game-app-laptop-demo_postgres_1   postgres:15-alpine              Up 13 minutes            5432/tcp
 game-app-laptop-demo_redis_1      redis:7-alpine                  Up 6 minutes             6379/tcp
 game-app-laptop-demo_backend_1    game-app-laptop-demo-backend    Up 13 minutes            0.0.0.0:3001->3001/tcp
 game-app-laptop-demo_frontend_1   game-app-laptop-demo-frontend   Up 6 minutes (healthy)   0.0.0.0:3000->80/tcp
-```
 ```
 
 ### Step 3: Test Your Application in Browser
@@ -94,7 +93,7 @@ Open your web browser and navigate to `http://localhost:3000`. You should see:
 ```bash
 # Test backend API health
 curl http://localhost:3001/health
-# Should return: {"status":"healthy"}
+```
 
 **Expected Output:**
 ```json
@@ -109,12 +108,13 @@ curl http://localhost:3001/health
 }
 ```
 
+```bash
 # Test frontend serves properly  
 curl http://localhost:3000/
-# Should return HTML content
+```
 
 **Expected Output:**
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,17 +133,17 @@ curl http://localhost:3000/
 </html>
 ```
 
+```bash
 # Test database connectivity
 docker-compose exec postgres psql -U gameuser -d humor_memory_game -c "SELECT version();"
-# Should return PostgreSQL version info
+```
 
 **Expected Output:**
-```
+```bash
                                                              version
 ----------------------------------------------------------------------------------------------------------------
  PostgreSQL 15.4 on x86_64-pc-linux-gnu, compiled by gcc (Alpine 12.2.1_git20220924-r4) 12.2.1 20220924, 64-bit
 (1 row)
-```
 ```
 
 ### Step 4: Verify Environment Variables
@@ -151,22 +151,10 @@ docker-compose exec postgres psql -U gameuser -d humor_memory_game -c "SELECT ve
 ```bash
 # Check environment variables are set correctly
 docker-compose exec backend env | grep -E "(DB_|REDIS_|NODE_ENV|PORT|API_BASE_URL)"
-
-# Should show:
-# DB_HOST=postgres
-# DB_PORT=5432
-# DB_NAME=humor_memory_game
-# DB_USER=gameuser
-# DB_PASSWORD=your_database_password_here
-# REDIS_HOST=redis
-# REDIS_PORT=6379
-# REDIS_PASSWORD=your_redis_password_here
-# NODE_ENV=development
-# PORT=3001
-# API_BASE_URL=/api
+```
 
 **Expected Output:**
-```
+```bash
 DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=humor_memory_game
@@ -179,12 +167,11 @@ NODE_ENV=development
 PORT=3001
 API_BASE_URL=/api
 ```
-```
 
 ## You Should See...
 
 **Service Status:**
-```
+```bash
 NAME                       IMAGE                           STATUS                    PORTS
 humor-game-postgres        postgres:15-alpine              Up 13 minutes            5432/tcp
 humor-game-redis           redis:7-alpine                  Up 6 minutes             6379/tcp
