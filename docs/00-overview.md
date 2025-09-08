@@ -19,6 +19,10 @@ This project teaches you enterprise-grade DevOps by building a real application 
 
 ## What You'll Build
 
+![Application Flow](../assets/images/app_flow.jpg)
+
+*Real-time user interaction flow from browser to database with error handling*
+
 A complete production application stack featuring:
 
 - **Multi-service application** running on Kubernetes
@@ -29,106 +33,15 @@ A complete production application stack featuring:
 
 ## Architecture Overview
 
-```mermaid
-graph TB
-    subgraph "🌐 Client Layer"
-        Client[🌐 Client Browser]
-        Mobile[📱 Mobile App]
-    end
-    
-    subgraph "☁️ CDN & Edge"
-        CDN[☁️ Cloudflare CDN<br/>gameapp.games]
-        Tunnel[🔗 Cloudflare Tunnel<br/>app.gameapp.games]
-    end
-    
-    subgraph "🚪 Ingress Layer"
-        Ingress[ Ingress Controller<br/>humor-game-nginx<br/>Port 80/443]
-        LB[⚖️ Load Balancer<br/>Port 8080:80]
-    end
-    
-    subgraph "🏗️ Application Layer"
-        Frontend[🌐 Frontend Service<br/>Port 80<br/>humor-game namespace]
-        Backend[🔧 Backend API Service<br/>Port 3001<br/>humor-game namespace]
-    end
-    
-    subgraph "🗄️ Data Layer"
-        Postgres[(🗄️ PostgreSQL<br/>humor_memory_game<br/>Port 5432)]
-        Redis[(🔴 Redis Cache<br/>Port 6379)]
-    end
-    
-    subgraph "📊 Monitoring Stack"
-        Prometheus[📊 Prometheus<br/>Port 9090<br/>monitoring namespace]
-        Grafana[📈 Grafana<br/>Port 3000<br/>monitoring namespace]
-    end
-    
-    subgraph "🔄 GitOps Layer"
-        ArgoCD[🔄 ArgoCD<br/>Port 8080<br/>argocd namespace]
-        Git[📚 Git Repository<br/>Configuration as Code]
-    end
-    
-    subgraph "🔒 Security Layer"
-        NP[🛡️ Network Policies<br/>Pod-to-Pod Security]
-        SC[🔐 Security Contexts<br/>Non-root Containers]
-        TLS[🔒 TLS Certificates<br/>Let's Encrypt]
-    end
-    
-    %% Client connections
-    Client --> CDN
-    Mobile --> CDN
-    Client --> Tunnel
-    
-    %% CDN to Ingress
-    CDN --> Ingress
-    Tunnel --> Ingress
-    
-    %% Ingress to Services
-    Ingress --> Frontend
-    Ingress --> Backend
-    
-    %% Service to Data
-    Backend --> Postgres
-    Backend --> Redis
-    
-    %% Monitoring connections
-    Backend --> Prometheus
-    Prometheus --> Grafana
-    
-    %% GitOps connections
-    Git --> ArgoCD
-    ArgoCD --> Frontend
-    ArgoCD --> Backend
-    
-    %% Security connections
-    NP --> Frontend
-    NP --> Backend
-    SC --> Frontend
-    SC --> Backend
-    TLS --> Ingress
-    
-    %% Load Balancer
-    LB --> Ingress
-    
-    %% Styling
-    classDef clientLayer fill:#e1f5fe
-    classDef cdnLayer fill:#f3e5f5
-    classDef ingressLayer fill:#e8f5e8
-    classDef appLayer fill:#fff3e0
-    classDef dataLayer fill:#fce4ec
-    classDef monitoringLayer fill:#e0f2f1
-    classDef gitopsLayer fill:#f1f8e9
-    classDef securityLayer fill:#ffebee
-    
-    class Client,Mobile clientLayer
-    class CDN,Tunnel cdnLayer
-    class Ingress,LB ingressLayer
-    class Frontend,Backend appLayer
-    class Postgres,Redis dataLayer
-    class Prometheus,Grafana monitoringLayer
-    class ArgoCD,Git gitopsLayer
-    class NP,SC,TLS securityLayer
-```
+![Technical Architecture](../assets/images/technical_architecture.jpg)
+
+*Complete production-grade infrastructure with monitoring, security, and global scaling*
 
 ## Learning Path
+
+![Learning Journey Flow](../assets/images/learning_flow.jpg)
+
+*Follow this step-by-step progression from beginner developer to production-ready DevOps engineer*
 
 | Milestone | Goal | What You'll Learn | ⏱️ Time |
 |-----------|------|-------------------|----------|

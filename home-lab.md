@@ -47,6 +47,10 @@ This guide has been reorganized into beginner-friendly, step-by-step documentati
 
 ## 🎯 **What You'll Build**
 
+![Learning Journey Flow](assets/images/learning_flow.jpg)
+
+*Follow this step-by-step progression from beginner developer to production-ready DevOps engineer*
+
 By the end of this guide, you'll have deployed a complete production-grade application stack featuring:
 
 - **Multi-service application** running on Kubernetes
