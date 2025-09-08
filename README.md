@@ -2,6 +2,9 @@
 
 *A comprehensive, beginner-friendly guide to building production-grade applications with Kubernetes, monitoring, GitOps, and global deployment*
 
+> This project is part of the **Zee DevOps Learning Path**  
+> Start: Quick Wins → Core: Beginner-DevOps-Labs → Reference: Troubleshooting Toolkit → Portfolio: Weekend Projects → Cloud: Cloud-DevOps-Projects
+
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Production%20Ready-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com/)
 [![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus%20%2B%20Grafana-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://prometheus.io/)
@@ -291,3 +294,18 @@ Special thanks to the open-source community and the maintainers of:
 ---
 
 *This guide teaches the same infrastructure patterns used by companies like Netflix, Airbnb, and GitHub. Start with [01-prereqs.md](docs/01-prereqs.md) to begin your journey!*
+
+---
+## Where to go next
+
+- ✅ **Stuck?** Open the **DevOps-Troubleshooting-Toolkit**: [https://github.com/Osomudeya/DevOps-Troubleshooting-Toolkit.git](https://github.com/Osomudeya/DevOps-Troubleshooting-Toolkit.git)
+  - Linux • Docker • Kubernetes • AWS • Azure • Observability
+
+- 🚶 **If you're early in your journey:** Start/continue the core path  
+  → **Beginner-DevOps-Labs** (Milestones 0 → 6) This repo Link: [https://github.com/Osomudeya/DevOps-Home-Lab-2025.git](https://github.com/Osomudeya/DevOps-Home-Lab-2025.git)
+
+- 🧰 **Want small, visual wins:**  
+  → **Quick DevOps Wins** (this repo)
+
+- 📦 **Ready for portfolio depth:**  
+  → **Weekend-DevOps-Projects** (5 focused, resume-grade builds) Link: [https://github.com/Osomudeya/side-devops-projects.git](https://github.com/Osomudeya/side-devops-projects.git)
