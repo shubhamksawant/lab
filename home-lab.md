@@ -1,6 +1,6 @@
-# Production Kubernetes Homelab: Table of Contents
+# Kubernetes Tutorial: Complete Learning Path
 
-*A beginner-friendly guide to deploying production-grade applications using Kubernetes, monitoring, and DevOps best practices*
+*Learn DevOps by building a real application: Docker → Kubernetes → Monitoring → GitOps → Global Deployment*
 
 ## 🚨 **CRITICAL: READ THIS BEFORE STARTING**
 
@@ -21,13 +21,13 @@ This guide has been reorganized into beginner-friendly, step-by-step documentati
 - **[01-prereqs.md](docs/01-prereqs.md)** - Tool installation and environment setup
 - **[name-map.md](docs/name-map.md)** - Complete reference of all names, hosts, and ports used
 
-### **🎯 Learning Milestones**
-- **[02-compose.md](docs/02-compose.md)** - Milestone 1: Docker Compose sanity check ⏱️ 20-40 min
-- **[03-k8s-basics.md](docs/03-k8s-basics.md)** - Milestone 2: Kubernetes basics and deployment ⏱️ 30-60 min
-- **[04-ingress.md](docs/04-ingress.md)** - Milestone 3: Ingress and external access ⏱️ 20-40 min
-- **[05-observability.md](docs/05-observability.md)** - Milestone 4: Monitoring and observability ⏱️ 45-90 min
-- **[06-gitops.md](docs/06-gitops.md)** - Milestone 5: GitOps and automated deployments ⏱️ 30-60 min
-- **[07-global.md](docs/07-global.md)** - Milestone 6: Production hardening and global scale ⏱️ 60-120 min
+### **🎯 Learning Tutorials**
+- **[02-compose.md](docs/02-compose.md)** - Docker Multi-Container App Tutorial ⏱️ 20-40 min
+- **[03-k8s-basics.md](docs/03-k8s-basics.md)** - Kubernetes Production Deployment ⏱️ 30-60 min
+- **[04-ingress.md](docs/04-ingress.md)** - Internet Access & Networking ⏱️ 20-40 min
+- **[05-observability.md](docs/05-observability.md)** - Performance Monitoring ⏱️ 45-90 min
+- **[06-gitops.md](docs/06-gitops.md)** - Automated Deployments ⏱️ 30-60 min
+- **[07-global.md](docs/07-global.md)** - Global Scale & Security ⏱️ 60-120 min
 
 ### **🛠️ Support & Reference**
 - **[08-troubleshooting.md](docs/08-troubleshooting.md)** - Common issues and solutions

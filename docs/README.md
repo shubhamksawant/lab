@@ -1,6 +1,6 @@
-# 📚 Production Kubernetes Documentation Hub
+# 📚 Kubernetes Tutorial Documentation Hub
 
-*Comprehensive guides for building production-grade applications with Kubernetes, monitoring, GitOps, and global deployment*
+*Learn DevOps by building a real application: Docker → Kubernetes → Monitoring → GitOps → Global Deployment*
 
 [![Documentation](https://img.shields.io/badge/Documentation-Complete-green?style=for-the-badge)](./00-overview.md)
 [![Beginner Friendly](https://img.shields.io/badge/Beginner-Friendly-blue?style=for-the-badge)](./01-prereqs.md)
@@ -30,14 +30,14 @@
 
 | Step | Guide | What You'll Learn | Time | Difficulty |
 |------|-------|-------------------|------|------------|
-| **0** | [📖 Project Overview](00-overview.md) | Architecture and learning objectives | 15 min | 🟢 Beginner |
-| **1** | [⚙️ Prerequisites Setup](01-prereqs.md) | Tool installation and environment setup | 30 min | 🟢 Beginner |
-| **2** | [🐳 Docker Compose](02-compose.md) | Containerization and local development | 45 min | 🟢 Beginner |
-| **3** | [☸️ Kubernetes Basics](03-k8s-basics.md) | Pod deployment and service discovery | 60 min | 🟡 Intermediate |
-| **4** | [🌐 Production Ingress](04-ingress.md) | Load balancing and SSL termination | 45 min | 🟡 Intermediate |
-| **5** | [📊 Observability](05-observability.md) | Monitoring, metrics, and dashboards | 90 min | 🟡 Intermediate |
-| **6** | [🔄 GitOps](06-gitops.md) | Automated deployment workflows | 60 min | 🟠 Advanced |
-| **7** | [🌍 Global Production](07-global.md) | CDN, security, and auto-scaling | 120 min | 🔴 Expert |
+| **0** | [📖 Learning Path Overview](00-overview.md) | Complete tutorial roadmap and architecture | 15 min | 🟢 Beginner |
+| **1** | [⚙️ Development Environment Setup](01-prereqs.md) | Install Docker, Kubernetes tools, and dev environment | 30 min | 🟢 Beginner |
+| **2** | [🐳 Docker Multi-Container App](02-compose.md) | Build your first containerized application | 45 min | 🟢 Beginner |
+| **3** | [☸️ Kubernetes Production Deployment](03-k8s-basics.md) | Deploy apps on Kubernetes with databases | 60 min | 🟡 Intermediate |
+| **4** | [🌐 Internet Access & Networking](04-ingress.md) | Make your app accessible from the internet | 45 min | 🟡 Intermediate |
+| **5** | [📊 Performance Monitoring](05-observability.md) | Track app health with Prometheus & Grafana | 90 min | 🟡 Intermediate |
+| **6** | [🔄 Automated Deployments](06-gitops.md) | Deploy with GitOps automation | 60 min | 🟠 Advanced |
+| **7** | [🌍 Global Scale & Security](07-global.md) | Production hardening, CDN, and auto-scaling | 120 min | 🔴 Expert |
 
 **⏱️ Total Time**: 5-8 hours  
 **🎯 Final Result**: Production-ready Kubernetes deployment with global access

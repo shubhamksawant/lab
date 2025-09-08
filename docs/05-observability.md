@@ -1,15 +1,25 @@
-# Milestone 4: Observability & Monitoring
+# Kubernetes Monitoring: Track Performance Like a Pro
 
-## 🎯 **Goal**
-Deploy a production-grade monitoring stack with Prometheus and Grafana to track application performance, resource usage, and system health.
+*Set up production-grade monitoring with Prometheus and Grafana to catch issues before they become problems*
 
-## ⏱️ **Typical Time: 45-90 minutes**
+## 🎯 **What You'll Learn**
+
+By the end of this tutorial, you'll know how to:
+- **Collect metrics** from your Kubernetes applications
+- **Create dashboards** to visualize performance data
+- **Set up alerts** to catch issues early
+- **Monitor resource usage** (CPU, memory, disk)
+- **Track application health** in real-time
+
+## ⏱️ **Time Required: 45-90 minutes**
 
 ## Why This Matters
 
-Monitoring isn't optional in production. This milestone teaches you the same observability patterns used by companies like Datadog and New Relic to track application performance and prevent outages before they happen.
+Monitoring isn't optional in production. This tutorial teaches you the same observability patterns used by companies like Datadog and New Relic to track application performance and prevent outages before they happen.
 
-ℹ️ **Side Note:** Observability is the ability to understand the internal state of a system by examining its outputs. In Kubernetes, this means collecting metrics (numbers), logs (text), and traces (request flows) to understand how your application is performing and identify issues before they become problems.
+**What this means for you**: Professional DevOps engineers spend 30% of their time on monitoring. Learning these tools makes you valuable to any team that runs production applications.
+
+ℹ️ **Simple Explanation:** Monitoring is like having a dashboard in your car. It shows you speed (request rate), fuel level (memory usage), and engine temperature (CPU usage) so you can catch problems before they break your application.
 
 ## 🚀 Quick Start (TL;DR)
 

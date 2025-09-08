@@ -1,15 +1,25 @@
-# Milestone 2: Kubernetes Basics
+# Kubernetes Tutorial: Deploy Your First Production App
 
-## 🎯 **Goal**
-Transform your Docker Compose application into a Kubernetes deployment, learning core concepts like Pods, Services, Deployments, and ConfigMaps.
+*Learn Kubernetes by deploying a real application with databases, monitoring, and scaling*
 
-## ⏱️ **Typical Time: 30-60 minutes**
+## 🎯 **What You'll Learn**
+
+By the end of this tutorial, you'll know how to:
+- **Deploy applications** on Kubernetes (the industry standard)
+- **Manage databases** with persistent storage
+- **Configure services** for internal communication
+- **Scale applications** automatically based on demand
+- **Monitor health** and troubleshoot issues
+
+## ⏱️ **Time Required: 30-60 minutes**
 
 ## Why This Matters
 
-This milestone teaches you the core Kubernetes concepts that every platform engineer needs to know: Pods, Services, Deployments, and ConfigMaps. You'll transform your Docker Compose application into a Kubernetes deployment.
+Kubernetes is the industry standard for deploying applications at scale. Companies like Netflix, Airbnb, and GitHub use Kubernetes to manage thousands of services serving millions of users. Learning Kubernetes isn't just about technology—it's about understanding how modern applications are built and deployed.
 
-ℹ️ **Side Note:** Kubernetes is a container orchestration platform that automates the deployment, scaling, and management of containerized applications. Think of it as a "smart scheduler" that can run your containers across multiple machines, handle failures automatically, and provide service discovery.
+**What this means for your career**: Kubernetes skills are in high demand. DevOps engineers with Kubernetes experience earn 20-30% more than those without it.
+
+ℹ️ **Simple Explanation:** Kubernetes is like a smart manager for your applications. It automatically handles scaling (adding more copies when busy), health checks (restarting failed services), and updates (rolling out new versions without downtime).
 
 ## Do This
 

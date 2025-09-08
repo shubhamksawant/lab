@@ -1,15 +1,24 @@
-# Milestone 1: Docker Compose Sanity
+# Docker Tutorial: Build Your First Multi-Container App
 
-## 🎯 **Goal**
-Verify your application works correctly in Docker Compose before deploying to Kubernetes, ensuring a solid foundation for the next milestones.
+*Learn containerization by running a real application with multiple services*
 
-## ⏱️ **Typical Time: 20-40 minutes**
+## 🎯 **What You'll Learn**
+
+By the end of this tutorial, you'll know how to:
+- **Run multiple services** together using Docker Compose
+- **Connect databases** to your application
+- **Test application functionality** before complex deployment
+- **Debug container issues** using logs and health checks
+
+## ⏱️ **Time Required: 20-40 minutes**
 
 ## Why This Matters
 
-Many Kubernetes deployment issues stem from application problems that existed in Docker Compose. By verifying everything works here first, you eliminate one major source of troubleshooting later.
+Docker Compose is like a practice run before the big game. It lets you test your application with multiple services (database, cache, frontend, backend) before deploying to Kubernetes. Think of it as building a house model before constructing the real thing.
 
-ℹ️ **Side Note:** Docker Compose is a tool for defining and running multi-container Docker applications. It uses a YAML file to configure application services, networks, and volumes. Think of it as a "single-machine orchestrator" that helps you run multiple containers together before moving to Kubernetes.
+**What this means for you**: Many Kubernetes deployment issues start here. If your app doesn't work in Docker Compose, it won't work in Kubernetes either.
+
+ℹ️ **Simple Explanation:** Docker Compose runs multiple containers together on your computer. It's like having a mini data center on your laptop where you can test everything before deploying to the real thing.
 
 ## Do This
 

@@ -1,6 +1,6 @@
-# 🎮 Production Kubernetes Homelab
+# 🎮 Kubernetes Tutorial: Build Production Apps from Scratch
 
-*A comprehensive, beginner-friendly guide to building production-grade applications with Kubernetes, monitoring, GitOps, and global deployment*
+*Learn DevOps by building a real application: Docker → Kubernetes → Monitoring → GitOps → Global Deployment. Perfect for career switchers and beginners.*
 
 > This project is part of the **Zee DevOps Learning Path**  
 > Start: Quick Wins → Core: Beginner-DevOps-Labs → Reference: Troubleshooting Toolkit → Portfolio: Weekend Projects → Cloud: Cloud-DevOps-Projects
@@ -9,6 +9,19 @@
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com/)
 [![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus%20%2B%20Grafana-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://prometheus.io/)
 [![ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)](https://argoproj.github.io/)
+
+---
+
+## 🎯 **What You'll Learn**
+
+By completing this tutorial, you'll master:
+- **Container orchestration** with Kubernetes (the same tech Netflix uses)
+- **Production monitoring** with Prometheus and Grafana dashboards
+- **Automated deployments** using GitOps principles
+- **Global scaling** with CDN and load balancing
+- **Real troubleshooting skills** that DevOps engineers use daily
+
+**Career Impact**: These skills are in high demand. DevOps engineers with Kubernetes experience earn 20-30% more than those without it.
 
 ---
 
@@ -79,13 +92,13 @@ curl http://localhost:3001/api/health
 
 | Milestone | What You'll Learn | Time | Difficulty |
 |-----------|-------------------|------|------------|
-| **[0. Prerequisites](docs/01-prereqs.md)** | Tool installation and setup | 15-30 min | 🟢 Beginner |
-| **[1. Docker Compose](docs/02-compose.md)** | Containerization and local development | 30-45 min | 🟢 Beginner |
-| **[2. Kubernetes Basics](docs/03-k8s-basics.md)** | Pod deployment and service discovery | 45-60 min | 🟡 Intermediate |
-| **[3. Production Ingress](docs/04-ingress.md)** | Load balancing and SSL termination | 30-45 min | 🟡 Intermediate |
-| **[4. Observability](docs/05-observability.md)** | Monitoring and alerting setup | 60-90 min | 🟡 Intermediate |
-| **[5. GitOps](docs/06-gitops.md)** | Automated deployment workflows | 45-60 min | 🟠 Advanced |
-| **[6. Global Production](docs/07-global.md)** | CDN, security, and auto-scaling | 90-120 min | 🔴 Expert |
+| **[0. Prerequisites](docs/01-prereqs.md)** | Development environment setup | 15-30 min | 🟢 Beginner |
+| **[1. Docker Compose](docs/02-compose.md)** | Multi-container application | 30-45 min | 🟢 Beginner |
+| **[2. Kubernetes Basics](docs/03-k8s-basics.md)** | Production app deployment | 45-60 min | 🟡 Intermediate |
+| **[3. Production Ingress](docs/04-ingress.md)** | Internet access and networking | 30-45 min | 🟡 Intermediate |
+| **[4. Observability](docs/05-observability.md)** | Performance monitoring | 60-90 min | 🟡 Intermediate |
+| **[5. GitOps](docs/06-gitops.md)** | Automated deployments | 45-60 min | 🟠 Advanced |
+| **[6. Global Production](docs/07-global.md)** | Global scale and security | 90-120 min | 🔴 Expert |
 
 **📚 Total Learning Time**: 5-8 hours  
 **🎯 Skill Level**: Beginner to Production-Ready DevOps Engineer
@@ -121,15 +134,15 @@ curl http://localhost:3001/api/health
 
 ## 📚 **Complete Documentation**
 
-### **📖 Core Guides**
-- **[🎯 Project Overview](docs/00-overview.md)** - Architecture and learning path
-- **[⚙️ Prerequisites Setup](docs/01-prereqs.md)** - Tool installation guide
-- **[🐳 Docker Compose](docs/02-compose.md)** - Local development setup
-- **[☸️ Kubernetes Basics](docs/03-k8s-basics.md)** - Core K8s deployment
-- **[🌐 Production Ingress](docs/04-ingress.md)** - External access setup
-- **[📊 Observability](docs/05-observability.md)** - Monitoring and dashboards
-- **[🔄 GitOps](docs/06-gitops.md)** - Automated deployment workflows
-- **[🌍 Global Deployment](docs/07-global.md)** - Production hardening and CDN
+### **📖 Core Tutorials**
+- **[🎯 Learning Path Overview](docs/00-overview.md)** - Complete tutorial roadmap
+- **[⚙️ Development Environment Setup](docs/01-prereqs.md)** - Install all required tools
+- **[🐳 Docker Multi-Container App](docs/02-compose.md)** - Build your first containerized app
+- **[☸️ Kubernetes Production Deployment](docs/03-k8s-basics.md)** - Deploy apps on Kubernetes
+- **[🌐 Internet Access & Networking](docs/04-ingress.md)** - Make your app accessible worldwide
+- **[📊 Performance Monitoring](docs/05-observability.md)** - Track app health and performance
+- **[🔄 Automated Deployments](docs/06-gitops.md)** - Deploy with GitOps automation
+- **[🌍 Global Scale & Security](docs/07-global.md)** - Production hardening and CDN
 
 ### **🔧 Reference Materials**
 - **[🚨 Troubleshooting](docs/08-troubleshooting.md)** - Common issues and solutions
@@ -137,10 +150,23 @@ curl http://localhost:3001/api/health
 - **[📖 Glossary](docs/10-glossary.md)** - Technical terms and definitions
 - **[📝 Decision Notes](docs/11-decision-notes.md)** - Architecture decisions explained
 
+### **🛠️ Advanced Guides**
+- **[🔒 Security Contexts](docs/security-contexts-guide.md)** - Production security hardening
+- **[📊 Custom Dashboards](docs/custom-dashboard-guide.md)** - Build monitoring dashboards
+- **[🌐 Cloudflare Setup](docs/cloudflare-tunnel-setup-guide.md)** - Global CDN configuration
+- **[🔍 Monitoring Troubleshooting](docs/monitoring-troubleshooting.md)** - Fix monitoring issues
+- **[🔄 GitOps Deep Dive](docs/argocd-deep-dive.md)** - Advanced GitOps patterns
+- **[🌍 Global Deployment](docs/global-deployment-troubleshooting.md)** - Production scaling issues
+
 ### **🎯 Career Development**
 - **[🎤 Interview Prep Guide](interviewprep.md)** - Technical interview preparation
-- **[📝 Medium Blog Post](medium-blog-post.md)** - Professional project writeup
 - **[📊 Architecture Overview](docs/00-overview.md#architecture-overview)** - Visual system documentation
+
+### **📁 Project Files**
+- **[🏠 Home Lab Guide](home-lab.md)** - Complete project overview
+- **[📋 File Structure](FILE-STRUCTURE.md)** - Project organization guide
+- **[🔒 Security Policy](SECURITY.md)** - Security guidelines and reporting
+- **[⚙️ Makefile](Makefile)** - Automation commands and shortcuts
 
 ---
 
