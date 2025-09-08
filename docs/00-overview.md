@@ -1,8 +1,21 @@
-# Overview: Production Kubernetes Homelab
+# Kubernetes Tutorial: Complete Learning Path
+
+*Master DevOps by building a real application that scales from local development to global production*
+
+## 🎯 What You'll Learn
+
+By the end of this tutorial, you'll know how to:
+- **Deploy applications** on Kubernetes (the industry standard)
+- **Monitor performance** with production-grade tools
+- **Automate deployments** using GitOps principles
+- **Scale globally** with CDN and load balancing
+- **Troubleshoot issues** like a professional DevOps engineer
 
 ## Why This Matters
 
 This project teaches you enterprise-grade DevOps by building a real application that scales from local development to global production. You'll learn the same patterns used by companies like Netflix, Airbnb, and GitHub.
+
+**Career Impact**: Kubernetes skills are in high demand. DevOps engineers with Kubernetes experience earn 20-30% more than those without it.
 
 ## What You'll Build
 
