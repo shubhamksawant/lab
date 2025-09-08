@@ -23,6 +23,12 @@ By completing this tutorial, you'll master:
 
 **Career Impact**: These skills are in high demand. DevOps engineers with Kubernetes experience earn 20-30% more than those without it.
 
+## 📈 **Learning Path Overview**
+
+![Learning Journey Flow](assets/images/learning_flow.jpg)
+
+*Follow this step-by-step progression from beginner developer to production-ready DevOps engineer*
+
 ---
 
 ## 🌟 **Live Demo**
@@ -66,6 +72,10 @@ curl http://localhost:3001/api/health
 
 ## 🎯 **What You'll Build**
 
+![Technical Architecture](assets/images/technical_architecture.jpg)
+
+*Complete production-grade infrastructure with monitoring, security, and global scaling*
+
 ### **🏗️ Production Application Stack**
 - 🎮 **Humor Memory Game** - Interactive web application with leaderboards
 - 🔄 **4 Microservices** - Frontend, Backend, PostgreSQL, Redis
@@ -102,6 +112,12 @@ curl http://localhost:3001/api/health
 
 **📚 Total Learning Time**: 5-8 hours  
 **🎯 Skill Level**: Beginner to Production-Ready DevOps Engineer
+
+## 🔄 **How It Works**
+
+![Application Flow](assets/images/app_flow.jpg)
+
+*Real-time user interaction flow from browser to database with error handling*
 
 ---
 
