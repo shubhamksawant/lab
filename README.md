@@ -190,11 +190,12 @@ curl http://localhost:3001/api/health
 
 ### **🔑 Domain Configuration**
 > **CRITICAL**: This project uses `gameapp.games` as an example domain. For your own deployment:
-> 1. Replace all instances of `gameapp.games` with your domain
-> 2. Configure Cloudflare DNS for your domain
-> 3. Update ingress configurations accordingly
+> 1. **Get a domain** (free options available for learning)
+> 2. Replace all instances of `gameapp.games` with your domain
+> 3. Configure Cloudflare DNS for your domain
+> 4. Update ingress configurations accordingly
 > 
-> **📝 See**: [Domain Replacement Guide](docs/domain-replacement-guide.md)
+> **📝 See**: [Domain Replacement Guide](docs/domain-replacement-guide.md) | [Free Domain Setup](docs/07-global.md#step-3a-prerequisites---get-a-domain)
 
 ### **💻 System Requirements**
 - **RAM**: 4GB+ available for Kubernetes cluster
