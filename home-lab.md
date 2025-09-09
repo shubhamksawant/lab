@@ -8,6 +8,8 @@
 
 **🔗 See: [Domain Replacement Guide](docs/domain-replacement-guide.md)** for the complete list of files to update.
 
+**🆓 Need a free domain? See: [Free Domain Setup](docs/07-global.md#step-3a-prerequisites---get-a-domain)** (Freenom, Duck DNS options)
+
 **🌐 For Cloudflare Tunnel setup, see: [Cloudflare Tunnel Setup Guide](docs/cloudflare-tunnel-setup-guide.md)**
 
 **❌ If you don't replace the domain, the card flipping functionality will break and you'll get stuck at Milestone 1.**
