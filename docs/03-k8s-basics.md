@@ -26,6 +26,11 @@ Kubernetes is the industry standard for deploying applications at scale. Compani
 ### Step 1: Create Your Kubernetes Cluster
 
 ```bash
+# Create a local Docker image registry (needed for pushing images used by Kubernetes (k3d) cluster)
+k3d registry create k3d-registry --port 5000
+```
+
+```bash
 # Create a local 3-node Kubernetes cluster
 k3d cluster create dev-cluster \
   --servers 1 \
@@ -37,6 +42,7 @@ k3d cluster create dev-cluster \
   k3d cluster create dev-cluster --servers 1 --agents 2 --port "8080:80@loadbalancer" --port "8443:443@loadbalancer" --k3s-arg --disable=traefik@server:0
 
   OR apply the k3d-config.yaml file
+  k3d cluster create --config k3d-config.yaml
 ```
 
 **Expected Output:**
@@ -131,6 +137,7 @@ kubectl apply -f k8s/postgres.yaml
 
 **Expected Output:**
 ```bash
+configmap/postgres-init created
 deployment.apps/humor-game-postgres created
 service/humor-game-postgres created
 persistentvolumeclaim/humor-game-postgres-pvc created
