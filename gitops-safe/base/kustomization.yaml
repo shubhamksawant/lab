@@ -8,6 +8,7 @@ metadata:
 # Base resources - BUILDING FOUNDATION FIRST
 # Start with core infrastructure, then add dependent resources
 resources:
+- namespace.yaml
 - configmap.yaml
 - pvc.yaml
 - postgres-init.yaml
