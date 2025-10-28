@@ -8,11 +8,11 @@ spec:
   
   # Source repositories - only allow your specific repo
   sourceRepos:
-  - 'https://github.com/Osomudeya/DevOps-Home-Lab-2025.git'
+  - 'https://github.com/shubhamksawant/lab.git'
   
   # Destination clusters and namespaces
   destinations:
-  - namespace: humor-game
+  - namespace: humor-game2
     server: https://kubernetes.default.svc
   
   # Cluster resource allow list - only allow specific resources
