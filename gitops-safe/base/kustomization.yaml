@@ -3,7 +3,7 @@ kind: Kustomization
 
 metadata:
   name: humor-game-base
-  namespace: humor-game
+  namespace: humor-game2
 
 # Base resources - BUILDING FOUNDATION FIRST
 # Start with core infrastructure, then add dependent resources
