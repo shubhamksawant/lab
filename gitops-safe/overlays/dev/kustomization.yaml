@@ -3,7 +3,7 @@ kind: Kustomization
 
 metadata:
   name: humor-game-dev
-  namespace: humor-game
+  namespace: humor-game2
 
 # This is a MONITORING-ONLY setup - it won't modify your working app
 # It just tracks what's different between Git and your cluster
