@@ -10,14 +10,14 @@ spec:
   
   # Source - your Git repository
   source:
-    repoURL: https://github.com/Osomudeya/DevOps-Home-Lab-2025.git
+    repoURL: https://github.com/shubhamksawant/lab.git
     targetRevision: main  # Use main branch
     path: gitops-safe/overlays/dev  # Path to your GitOps configs
   
   # Destination - your app namespace
   destination:
     server: https://kubernetes.default.svc
-    namespace: humor-game
+    namespace: humor-game2
   
   # Sync policy - MANUAL ONLY for safety
   syncPolicy:
