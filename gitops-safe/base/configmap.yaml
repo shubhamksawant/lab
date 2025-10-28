@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: humor-game-config
-  namespace: humor-game
+  namespace: humor-game2
 data:
   NODE_ENV: "development"
   DB_NAME: "humor_memory_game"
