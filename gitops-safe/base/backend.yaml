@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: humor-game
+  namespace: humor-game2
 spec:
   replicas: 1
   selector:
