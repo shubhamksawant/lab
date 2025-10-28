@@ -36,4 +36,5 @@ commonAnnotations:
   gitops.argoproj.io/version: "1.0.0"
 
 # No patches or transformations for now
-# This ensures your working app stays exactly as is
+# This ensures your working app stays exactly as is 
+# test auto sync
