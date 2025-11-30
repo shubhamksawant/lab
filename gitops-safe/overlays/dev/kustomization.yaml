@@ -18,7 +18,7 @@ resources: []
 
 # Common labels for tracking
 commonLabels:
-  app.kubernetes.io/name: humor-game
+  app.kubernetes.io/name: humor-game2
   app.kubernetes.io/instance: dev
   app.kubernetes.io/part-of: gitops-demo
   app.kubernetes.io/managed-by: argocd
