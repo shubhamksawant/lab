@@ -51,6 +51,19 @@ jobs:
       #     exit-code: 1
       #     format: 'table'
     
+      # --- SAST - SonarCloud Static Analysis ---
+      # FIXED: Removed buggy args; use sonar-project.properties + env for dynamics.
+      # Create the properties file dynamically (avoids secrets in args).
+      - name: 🔐 Setup Sonar Properties
+        run: |
+          cat > sonar-project.properties << EOF
+          sonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+          sonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+          sonar.sources=./backend,./frontend/src
+          sonar.tests=./backend/tests,./frontend/tests  # Optional: Add if you have test dirs
+          sonar.exclusions=**/node_modules/**,**/build/**,**/dist/**
+          EOF
+
       - name: 🔐 SonarCloud Static Analysis (SAST)
         uses: sonarsource/sonarqube-scan-action@v6
         env:
@@ -58,10 +71,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectBaseDir: .
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.sources=./backend,./frontend/src
+
+      # OPTIONAL: Wait for Sonar quality gate (fails job if gate fails)
+      - name: 🎯 Check Sonar Quality Gate
+        if: always()  # Run even if scan fails, but fail workflow on gate fail
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
       # --- UNIT TESTS ---
