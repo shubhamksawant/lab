@@ -135,14 +135,14 @@ jobs:
           # CRITICAL FIX: Load the image into the Docker daemon so Trivy can see it
           outputs: type=docker
 
-      - name: 🔍 Trivy Image Scan (Frontend)
-        # uses: aquasecurity/trivy-action@master
-        # with:
-        #   scan-type: 'image'
-        #   image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
-        #   severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
-        #   exit-code: 1 
-        #   format: 'table'
+      # - name: 🔍 Trivy Image Scan (Frontend)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'image'
+      #     image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+      #     severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
+      #     exit-code: 1 
+      #     format: 'table'
 
       - name: 🚀 Push Frontend to GHCR
         if: success() # Only push if scan passed
