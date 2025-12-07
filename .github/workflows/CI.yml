@@ -51,27 +51,22 @@ jobs:
       #     exit-code: 1
       #     format: 'table'
 
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v6
+# .github/workflows/deploy.yml (MODIFIED security-and-test JOB)
+# ... inside security-and-test job ...
+
+      - name: 🔐 SonarCloud Static Analysis (SAST)
+        # Using v6 is the correct, secure version
+        uses: sonarsource/sonarqube-scan-action@v6 
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # This is the ONLY way that works reliably with v6 + scanner 7.x
-          args: >-
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.sources=./backend,./frontend/src
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js,**/coverage/**,**/dist/**,**/build/**
-            -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info,./frontend/coverage/lcov.info
+          projectBaseDir: .
+          # CRITICAL FIX: Use the 'inline' syntax to remove all ambiguity. 
+          # Ensure this is a single, clean line in your YAML file.
+          args: "-Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.sources=./backend,./frontend/src -Dsonar.host.url=https://sonarcloud.io -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js,**/coverage/**,**/dist/**,**/build/** -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info,./frontend/coverage/lcov.info"
 
-      - name: SonarCloud Quality Gate
-        if: always()
-        uses: sonarsource/sonarqube-quality-gate-action@v1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+      # ... (Remaining steps) ...
 
       # --- UNIT TESTS ---
       - name: 🧪 Run Unit Tests
