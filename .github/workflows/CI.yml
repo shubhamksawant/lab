@@ -51,19 +51,6 @@ jobs:
       #     exit-code: 1
       #     format: 'table'
 
-# .github/workflows/deploy.yml (UPDATED security-and-test JOB)
-# ... inside security-and-test job ...
-
-      - name: 🔐 SonarCloud Static Analysis (SAST)
-        uses: sonarsource/sonarqube-scan-action@v6 
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectBaseDir: .
-          # CRITICAL FIX: Use a single, quoted inline string to eliminate hidden newlines
-          args: "-Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.sources=./backend,./frontend/src -Dsonar.host.url=https://sonarcloud.io -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js,**/coverage/**,**/dist/**,**/build/** -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info,./frontend/coverage/lcov.info"
-
           
       # --- UNIT TESTS ---
       - name: 🧪 Run Unit Tests
