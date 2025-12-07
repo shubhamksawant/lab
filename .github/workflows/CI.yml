@@ -39,26 +39,28 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           
-      # --- TRIVY FILESYSTEM SCAN (Secrets, SCA) ---
+      # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
+      # This performs the Dependency Scan (SCA) by analyzing package-lock.json
       - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: '.' # Scans the entire repository for secrets, vulnerabilities, and IaC/Config misconfigurations
-          security-checks: 'vuln,config,secret' 
-          severity: 'CRITICAL,HIGH' # SECURITY GATE 1: Fail if Critical or High issues found in code/deps
+          scan-ref: '.'
+          scanners: 'vulnerability,misconfiguration,secret' 
+          severity: 'CRITICAL,HIGH' 
           exit-code: 1
           format: 'table'
           
-      # --- SONARCLOUD SAST SCAN ---
+      # --- SAST - SonarCloud Static Analysis ---
       - name: 🔐 SonarCloud Static Analysis (SAST)
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: sonarsource/sonarqube-scan-action@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectBaseDir: .
-          args: >
+          # CRITICAL FIX: Use '|' pipe syntax for reliable multiline arguments
+          args: |
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} 
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.sources=./backend,./frontend/src
