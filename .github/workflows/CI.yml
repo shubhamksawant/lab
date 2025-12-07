@@ -1,0 +1,183 @@
+name: 🚀 DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+env:
+  # Registry URL is now GHCR (ghcr.io)
+  # Uses the repository owner as the base for the registry path
+  REGISTRY: ghcr.io
+  IMAGE_NAME_BACKEND: humor-game-backend
+  IMAGE_NAME_FRONTEND: humor-game-frontend
+  REPO_OWNER: ${{ github.repository_owner }} # Used to construct the full GHCR image path
+
+jobs:
+  ###################################################
+  # JOB 1: SECURITY & TEST (Shift-Left/Fail-Fast)
+  ###################################################
+  security-and-test:
+    name: 🛡️ Security Checks & Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for SonarCloud PR analysis
+          
+      - name: 📦 Setup Node.js & Install dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          
+      - name: ⬇️ Install Node.js Dependencies
+        run: |
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          
+      # --- TRIVY FILESYSTEM SCAN (Secrets, SCA) ---
+      - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.' # Scans the entire repository for secrets, vulnerabilities, and IaC/Config misconfigurations
+          security-checks: 'vuln,config,secret' 
+          severity: 'CRITICAL,HIGH' # SECURITY GATE 1: Fail if Critical or High issues found in code/deps
+          exit-code: 1
+          format: 'table'
+          
+      # --- SONARCLOUD SAST SCAN ---
+      - name: 🔐 SonarCloud Static Analysis (SAST)
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} 
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=./backend,./frontend/src
+
+      # --- UNIT TESTS ---
+      - name: 🧪 Run Unit Tests
+        run: |
+          cd backend && npm test
+          cd ../frontend && npm test
+
+  ###################################################
+  # JOB 2: BUILD, PUSH & ARTIFACT SECURITY
+  ###################################################
+  build-and-push:
+    name: 🏗️ Build, Scan, and Push Images
+    runs-on: ubuntu-latest
+    needs: [security-and-test]
+    if: success() && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🐳 Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: 🔐 Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }} # Use the GitHub Actor for GHCR login
+          password: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN (requires 'write:packages' permission)
+      
+      # --- TRIVY IAC CONFIG SCAN (Config Security) ---
+      - name: ⚙️ Trivy IaC Scan on Kustomize Configs
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: 'gitops-safe' # Target your Kustomize folder for K8s misconfigs
+          security-checks: 'config'
+          severity: 'CRITICAL,HIGH' # Fail if insecure K8s config is detected
+          exit-code: 1
+          format: 'table'
+
+      # --- BUILD, SCAN, AND PUSH BACKEND ---
+      - name: 🏗️ Build Backend Image
+        uses: docker/build-push-action@v5
+        id: build_backend
+        with:
+          context: ./backend
+          push: false # Build locally first for scanning
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+
+      - name: 🔍 Trivy Image Scan (Backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+          severity: 'CRITICAL,HIGH' # SECURITY GATE 2: Fail if vulnerable artifact is detected
+          exit-code: 1 
+          format: 'table'
+
+      - name: 🚀 Push Backend to GHCR
+        if: success() # Only push if scan passed
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:latest
+
+      # --- BUILD, SCAN, AND PUSH FRONTEND ---
+      - name: 🏗️ Build Frontend Image
+        uses: docker/build-push-action@v5
+        id: build_frontend
+        with:
+          context: ./frontend
+          push: false # Build locally first
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+
+      - name: 🔍 Trivy Image Scan (Frontend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+          severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
+          exit-code: 1 
+          format: 'table'
+
+      - name: 🚀 Push Frontend to GHCR
+        if: success() # Only push if scan passed
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
+
+  ###################################################
+  # JOB 4: NOTIFY
+  ###################################################
+  notify:
+    name: 📢 Notify Team
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    
+    steps:
+      - name: 📢 Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          text: |
+            🚀 Deployment ${{ job.status }} for Humor Memory Game
+            Commit: ${{ github.sha }}
+            Branch: ${{ github.ref_name }}
+            Environment: Production
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
