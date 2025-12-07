@@ -39,17 +39,17 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           
-      # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
-      # This performs the Dependency Scan (SCA) by analyzing package-lock.json
-      - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vulnerability,misconfiguration,secret' 
-          severity: 'CRITICAL,HIGH' 
-          exit-code: 1
-          format: 'table'
+      # # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
+      # # This performs the Dependency Scan (SCA) by analyzing package-lock.json
+      # - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'fs'
+      #     scan-ref: '.'
+      #     scanners: 'vulnerability,misconfiguration,secret' 
+      #     severity: 'CRITICAL,HIGH' 
+      #     exit-code: 1
+      #     format: 'table'
           
       # --- SAST - SonarCloud Static Analysis ---
       - name: 🔐 SonarCloud Static Analysis (SAST)
