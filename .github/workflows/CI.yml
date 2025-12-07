@@ -92,21 +92,25 @@ jobs:
       #     exit-code: 1
       #     format: 'table'
 
-      # --- BUILD, SCAN, AND PUSH BACKEND ---
+     # --- BUILD BACKEND IMAGE (STAGING ARTIFACT) ---
       - name: 🏗️ Build Backend Image
         uses: docker/build-push-action@v5
         id: build_backend
         with:
           context: ./backend
-          push: false # Build locally first for scanning
+          push: false # Keep this to scan before pushing
           tags: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+          # CRITICAL FIX: Load the image into the Docker daemon so Trivy can see it
+          outputs: type=docker 
 
+      # --- TRIVY IMAGE SCAN (Backend Artifact Security) ---
+      # This step will now successfully find the image locally
       - name: 🔍 Trivy Image Scan (Backend)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'image'
           image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
-          severity: 'CRITICAL,HIGH' # SECURITY GATE 2: Fail if vulnerable artifact is detected
+          severity: 'CRITICAL,HIGH' 
           exit-code: 1 
           format: 'table'
 
@@ -128,6 +132,8 @@ jobs:
           context: ./frontend
           push: false # Build locally first
           tags: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+          # CRITICAL FIX: Load the image into the Docker daemon so Trivy can see it
+          outputs: type=docker
 
       - name: 🔍 Trivy Image Scan (Frontend)
         uses: aquasecurity/trivy-action@master
