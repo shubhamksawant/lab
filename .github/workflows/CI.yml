@@ -57,12 +57,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: >
+          # This is the ONLY way that works reliably with v6 + scanner 7.x
+          args: >-
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=./backend,./frontend/src
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js,**/coverage/**,**/dist/**,**/build/**
+            -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info,./frontend/coverage/lcov.info
 
       - name: SonarCloud Quality Gate
         if: always()
