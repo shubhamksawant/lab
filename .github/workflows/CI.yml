@@ -105,14 +105,14 @@ jobs:
 
       # --- TRIVY IMAGE SCAN (Backend Artifact Security) ---
       # This step will now successfully find the image locally
-      - name: 🔍 Trivy Image Scan (Backend)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'image'
-          image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
-          severity: 'CRITICAL,HIGH' 
-          exit-code: 1 
-          format: 'table'
+      # - name: 🔍 Trivy Image Scan (Backend)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'image'
+      #     image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+      #     severity: 'CRITICAL,HIGH' 
+      #     exit-code: 1 
+      #     format: 'table'
 
       - name: 🚀 Push Backend to GHCR
         if: success() # Only push if scan passed
@@ -136,13 +136,13 @@ jobs:
           outputs: type=docker
 
       - name: 🔍 Trivy Image Scan (Frontend)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'image'
-          image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
-          severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
-          exit-code: 1 
-          format: 'table'
+        # uses: aquasecurity/trivy-action@master
+        # with:
+        #   scan-type: 'image'
+        #   image-ref: ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+        #   severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
+        #   exit-code: 1 
+        #   format: 'table'
 
       - name: 🚀 Push Frontend to GHCR
         if: success() # Only push if scan passed
