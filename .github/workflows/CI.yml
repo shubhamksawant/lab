@@ -50,16 +50,16 @@ jobs:
       #     severity: 'CRITICAL,HIGH' 
       #     exit-code: 1
       #     format: 'table'
-          
+    
       # --- SAST - SonarCloud Static Analysis ---
       - name: 🔐 SonarCloud Static Analysis (SAST)
-        uses: sonarsource/sonarqube-scan-action@v5
+        # FIX 1: Upgrade to v6 for security and stability
+        uses: sonarsource/sonarqube-scan-action@v6 
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectBaseDir: .
-          # CRITICAL FIX: Use '|' pipe syntax for reliable multiline arguments
           args: |
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} 
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
