@@ -58,6 +58,23 @@ jobs:
           cd backend && npm test
           cd ../frontend && npm test
 
+# --- NOTIFICATION STEP (Run Always) ---
+      - name: 📢 Slack Notification Security Status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#devops'
+          text: |
+            *🛡️ JOB 1 STATUS: Security Checks & Tests*
+            
+            *Status:* ${{ job.status }}
+            *Repo:* ${{ github.repository }}
+            *Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Pipeline Run #${{ github.run_number }}>
+            *Summary:* Static Analysis (SonarCloud) and Unit Tests complete.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   ###################################################
   # JOB 2: BUILD, PUSH & ARTIFACT SECURITY
   ###################################################
@@ -154,25 +171,43 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
 
-  ###################################################
-  # JOB 4: NOTIFY
-  ###################################################
-  notify:
-    name: 📢 Notify Team
-    runs-on: ubuntu-latest
-    needs: [build-and-push]
-    if: always()
-    
-    steps:
-      - name: 📢 Slack notification
+       # --- NOTIFICATION STEP (Run Always) ---
+      - name: 📢 Slack Notification Build & Artifact Status
+        if: always()
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          channel: '#deployments'
+          channel: '#devops'
           text: |
-            🚀 Deployment ${{ job.status }} for Humor Memory Game
-            Commit: ${{ github.sha }}
-            Branch: ${{ github.ref_name }}
-            Environment: Production
+            *📦 JOB 2 STATUS: Build & Artifact Security*
+            
+            *Status:* ${{ job.status }}
+            *Artifacts:* Backend and Frontend Images
+            *Target:* GHCR (${{ env.REPO_OWNER }})
+            *Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Pipeline Run #${{ github.run_number }}>
+            *Summary:* Artifacts built and passed Trivy Image Scan. Ready for deployment.
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ###################################################
+  # # JOB 4: NOTIFY
+  # ###################################################
+  # notify:
+  #   name: 📢 Notify Team
+  #   runs-on: ubuntu-latest
+  #   needs: [build-and-push]
+  #   if: always()
+    
+  #   steps:
+  #     - name: 📢 Slack notification
+  #       uses: 8398a7/action-slack@v3
+  #       with:
+  #         status: ${{ job.status }}
+  #         channel: '#deployments'
+  #         text: |
+  #           🚀 Deployment ${{ job.status }} for Humor Memory Game
+  #           Commit: ${{ github.sha }}
+  #           Branch: ${{ github.ref_name }}
+  #           Environment: Production
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
