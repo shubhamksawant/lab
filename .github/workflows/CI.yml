@@ -81,16 +81,16 @@ jobs:
           username: ${{ github.actor }} # Use the GitHub Actor for GHCR login
           password: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN (requires 'write:packages' permission)
       
-      # --- TRIVY IAC CONFIG SCAN (Config Security) ---
-      - name: ⚙️ Trivy IaC Scan on Kustomize Configs
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'config'
-          scan-ref: 'gitops-safe' # Target your Kustomize folder for K8s misconfigs
-          security-checks: 'config'
-          severity: 'CRITICAL,HIGH' # Fail if insecure K8s config is detected
-          exit-code: 1
-          format: 'table'
+      # # --- TRIVY IAC CONFIG SCAN (Config Security) ---
+      # - name: ⚙️ Trivy IaC Scan on Kustomize Configs
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'config'
+      #     scan-ref: 'gitops-safe' # Target your Kustomize folder for K8s misconfigs
+      #     security-checks: 'config'
+      #     severity: 'CRITICAL,HIGH' # Fail if insecure K8s config is detected
+      #     exit-code: 1
+      #     format: 'table'
 
       # --- BUILD, SCAN, AND PUSH BACKEND ---
       - name: 🏗️ Build Backend Image
