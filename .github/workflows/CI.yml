@@ -39,17 +39,27 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           
-      # # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
-      # # This performs the Dependency Scan (SCA) by analyzing package-lock.json
-      # - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     scan-type: 'fs'
-      #     scan-ref: '.'
-      #     scanners: 'vulnerability,misconfiguration,secret' 
-      #     severity: 'CRITICAL,HIGH' 
-      #     exit-code: 1
-      #     format: 'table'
+      # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
+      # This performs the Dependency Scan (SCA) by analyzing package-lock.json
+      - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vulnerability,misconfiguration,secret' 
+          severity: 'CRITICAL,HIGH' 
+          exit-code: 1
+          format: 'table'
+          output: 'trivy-fs-report.json' # <-- CREATES THE FILE HERE
+
+      
+      # --- Upload Report File ---
+      - name: ⬆️ Upload Trivy Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report-${{ github.sha_short }}
+          path: trivy-fs-report.json
+          retention-days: 7 # How long to keep the report
 
           
       # --- UNIT TESTS ---
