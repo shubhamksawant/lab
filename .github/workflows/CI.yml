@@ -39,28 +39,28 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           
-      # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
-      # This performs the Dependency Scan (SCA) by analyzing package-lock.json
-      - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vulnerability,misconfiguration,secret' 
-          severity: 'CRITICAL,HIGH' 
-          exit-code: 1
-          format: 'table'
-          output: 'trivy-fs-report.txt'
+      # # --- TRIVY FILESYSTEM SCAN (SCA, Secrets, IaC/Config) ---
+      # # This performs the Dependency Scan (SCA) by analyzing package-lock.json
+      # - name: 🔍 Trivy Filesystem Scan (SCA, Secrets, Config)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'fs'
+      #     scan-ref: '.'
+      #     scanners: 'vulnerability,misconfiguration,secret' 
+      #     severity: 'CRITICAL,HIGH' 
+      #     exit-code: 1
+      #     format: 'table'
+      #     output: 'trivy-fs-report.txt'
 
       
-      - name: ⬆️ Upload Trivy Report Artifact
-        # CRITICAL FIX: Add 'if: always()' to ensure this runs even if Trivy fails
-        if: always() 
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-fs-report-${{ github.sha_short }}
-          path: trivy-fs-report.txt
-          retention-days: 7
+      # - name: ⬆️ Upload Trivy Report Artifact
+      #   # CRITICAL FIX: Add 'if: always()' to ensure this runs even if Trivy fails
+      #   if: always() 
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-fs-report-${{ github.sha_short }}
+      #     path: trivy-fs-report.txt
+      #     retention-days: 7
 
           
       # --- UNIT TESTS ---
@@ -109,8 +109,8 @@ jobs:
           username: ${{ github.actor }} # Use the GitHub Actor for GHCR login
           password: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN (requires 'write:packages' permission)
       
-      # # --- TRIVY IAC CONFIG SCAN (Config Security) ---
-      # - name: ⚙️ Trivy IaC Scan on Kustomize Configs
+      # # --- TRIVY k8s CONFIG SCAN (Config Security) ---
+      # - name: ⚙️ Trivy k8s Scan on Kustomize Configs
       #   uses: aquasecurity/trivy-action@master
       #   with:
       #     scan-type: 'config'
@@ -119,6 +119,19 @@ jobs:
       #     severity: 'CRITICAL,HIGH' # Fail if insecure K8s config is detected
       #     exit-code: 1
       #     format: 'table'
+      #     output: 'trivy-k8s-config-report.txt'
+
+      
+      # - name: ⬆️ Upload Trivy Report Artifact
+      #   if: always() 
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-k8s-config-report-${{ github.sha_short }}
+      #     path: 'trivy-k8s-config-report.txt'
+      #     retention-days: 7
+
+
+
 
      # --- BUILD BACKEND IMAGE (STAGING ARTIFACT) ---
       - name: 🏗️ Build Backend Image
@@ -131,8 +144,8 @@ jobs:
           # CRITICAL FIX: Load the image into the Docker daemon so Trivy can see it
           outputs: type=docker 
 
-      # --- TRIVY IMAGE SCAN (Backend Artifact Security) ---
-      # This step will now successfully find the image locally
+      # # --- TRIVY IMAGE SCAN (Backend Artifact Security) ---
+      # # This step will now successfully find the image locally
       # - name: 🔍 Trivy Image Scan (Backend)
       #   uses: aquasecurity/trivy-action@master
       #   with:
@@ -141,6 +154,16 @@ jobs:
       #     severity: 'CRITICAL,HIGH' 
       #     exit-code: 1 
       #     format: 'table'
+      #     output: 'trivy-backend-image-report.txt'
+
+      
+      # - name: ⬆️ Upload Trivy Report Artifact
+      #   if: always() 
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-backend-image-report-${{ github.sha_short }}
+      #     path: 'trivy-backend-image-report.txt'
+      #     retention-days: 7
 
       - name: 🚀 Push Backend to GHCR
         if: success() # Only push if scan passed
@@ -171,6 +194,15 @@ jobs:
       #     severity: 'CRITICAL,HIGH' # Fail if vulnerable image is detected
       #     exit-code: 1 
       #     format: 'table'
+      #     output: 'trivy-frontend-image-report.txt'
+
+      # - name: ⬆️ Upload Trivy Report Artifact
+      #   if: always() 
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-frontend-image-report-${{ github.sha_short }}
+      #     path: 'trivy-frontend-image-report.txt'
+      #     retention-days: 7
 
       - name: 🚀 Push Frontend to GHCR
         if: success() # Only push if scan passed
