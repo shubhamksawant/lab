@@ -49,17 +49,18 @@ jobs:
           scanners: 'vulnerability,misconfiguration,secret' 
           severity: 'CRITICAL,HIGH' 
           exit-code: 1
-          format: 'table'
+          format: 'json'
           output: 'trivy-fs-report.json' # <-- CREATES THE FILE HERE
 
       
-      # --- Upload Report File ---
       - name: ⬆️ Upload Trivy Report Artifact
+        # CRITICAL FIX: Add 'if: always()' to ensure this runs even if Trivy fails
+        if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: trivy-fs-report-${{ github.sha_short }}
           path: trivy-fs-report.json
-          retention-days: 7 # How long to keep the report
+          retention-days: 7
 
           
       # --- UNIT TESTS ---
