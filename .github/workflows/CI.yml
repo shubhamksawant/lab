@@ -228,7 +228,7 @@ jobs:
             *Artifacts:* Backend and Frontend Images
             *Target:* GHCR (${{ env.REPO_OWNER }})
             *Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Pipeline Run #${{ github.run_number }}>
-            *Summary:* Artifacts built and passed Trivy Image Scan. Ready for deployment.
+            *Summary:* Artifacts built and passed Trivy Image Scadn. Ready for deployment.
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -259,13 +259,13 @@ jobs:
 
           if [[ "${{ github.ref_name }}" == "develop" ]]; then
             ENV_NAME="dev"
-            VALUES_FILE="lab/helm-chart/values-dev.yaml"
+            VALUES_FILE="helm-chart/values-dev.yaml"
           elif [[ "${{ github.ref_name }}" == "main" ]]; then
             ENV_NAME="prod"
-            VALUES_FILE="lab/helm-chart/values-prod.yaml"
+            VALUES_FILE="helm-chart/values-prod.yaml"
           elif [[ "${{ github.ref_name }}" == "qa" ]]; then
             ENV_NAME="qa"
-            VALUES_FILE="lab/helm-chart/values-qa.yaml"
+            VALUES_FILE="helm-chart/values-qa.yaml"
           else
             echo "Unsupported branch: ${{ github.ref_name }}"
             exit 1
