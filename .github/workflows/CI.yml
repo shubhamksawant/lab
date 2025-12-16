@@ -259,13 +259,13 @@ jobs:
 
           if [[ "${{ github.ref_name }}" == "develop" ]]; then
             ENV_NAME="dev"
-            VALUES_FILE="lab/helm-chart/values-dev.yaml"
+            VALUES_FILE="helm-chart/values-dev.yaml"
           elif [[ "${{ github.ref_name }}" == "main" ]]; then
             ENV_NAME="prod"
-            VALUES_FILE="lab/helm-chart/values-prod.yaml"
+            VALUES_FILE="helm-chart/values-prod.yaml"
           elif [[ "${{ github.ref_name }}" == "qa" ]]; then
             ENV_NAME="qa"
-            VALUES_FILE="lab/helm-chart/values-qa.yaml"
+            VALUES_FILE="helm-chart/values-qa.yaml"
           else
             echo "Unsupported branch: ${{ github.ref_name }}"
             exit 1
