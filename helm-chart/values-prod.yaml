@@ -5,7 +5,7 @@ namespace: humor-game-prod
 
 backend:
   image:
-    tag: v1.0.0
+    tag: "5e1b814"
     repository: humor-game-backend
   imagePullPolicy: Always
   replicaCount: 3
@@ -20,7 +20,7 @@ backend:
 
 frontend:
   image:
-    tag: v1.0.0
+    tag: "5e1b814"
     repository: humor-game-frontend
   imagePullPolicy: Always
   replicaCount: 3
