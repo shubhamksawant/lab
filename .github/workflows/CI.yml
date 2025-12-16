@@ -248,133 +248,106 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 🔍 Determine environment, values file, and branch name
-        id: env
+
+      - name: 🔍 Map Branch to Environment
+        id: vars
         run: |
-          SHORT_SHA="${{ github.sha }}"
-          SHORT_SHA="${SHORT_SHA:0:7}"  # First 7 characters of commit SHA
-
-          if [[ "${{ github.ref_name }}" == "develop" ]]; then
-            ENV_NAME="dev"
-            VALUES_FILE="helm-chart/values-dev.yaml"
-          elif [[ "${{ github.ref_name }}" == "main" ]]; then
-            ENV_NAME="prod"
-            VALUES_FILE="helm-chart/values-prod.yaml"
-          elif [[ "${{ github.ref_name }}" == "qa" ]]; then
-            ENV_NAME="qa"
-            VALUES_FILE="helm-chart/values-qa.yaml"
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          BRANCH_NAME="${{ github.ref_name }}"
+          
+          # Branch Mapping Logic
+          if [[ "$BRANCH_NAME" == "develop" ]]; then
+            ENV="dev"
+            FILE="helm-chart/values-dev.yaml"
+          elif [[ "$BRANCH_NAME" == "qa" ]]; then
+            ENV="qa"
+            FILE="helm-chart/values-qa.yaml"
+          elif [[ "$BRANCH_NAME" == "main" ]]; then
+            ENV="prod"
+            FILE="helm-chart/values-prod.yaml"
           else
-            echo "Unsupported branch: ${{ github.ref_name }}"
+            echo "❌ Error: Branch $BRANCH_NAME does not have a mapped environment."
             exit 1
           fi
 
-          PROMOTE_BRANCH="helm/tag-update-to-$ENV_NAME-$SHORT_SHA"
-
-          echo "name=$ENV_NAME" >> $GITHUB_OUTPUT
-          echo "file=$VALUES_FILE" >> $GITHUB_OUTPUT
-          echo "branch=$PROMOTE_BRANCH" >> $GITHUB_OUTPUT
           echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "env=$ENV" >> $GITHUB_OUTPUT
+          echo "file=$FILE" >> $GITHUB_OUTPUT
+          echo "pr_branch=helm/update-$ENV-$SHORT_SHA" >> $GITHUB_OUTPUT
 
-      - name: 🛠️ Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: 🌿 Create temporary promotion branch
-        run: |
-          git checkout -b ${{ steps.env.outputs.branch }}
-
-      - name: ✏️ Update image tags in values file (only backend & frontend)
+      - name: ✏️ Native Update & Push
         id: update
-        env:
-          NEW_TAG: ${{ steps.env.outputs.short_sha }}
-          VALUES_FILE: ${{ steps.env.outputs.file }}
         run: |
-          # Scoped update only within backend: and frontend: blocks
-          sed -i "/^\s*backend:/,/^\s*[^[:space:]]/ s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
-          sed -i "/^\s*frontend:/,/^\s*[^[:space:]]/ s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
+          FILE="${{ steps.vars.outputs.file }}"
+          TAG="${{ steps.vars.outputs.short_sha }}"
+          PR_BRANCH="${{ steps.vars.outputs.pr_branch }}"
+          
+          # Robust Native sed: 
+          # Finds the 'backend:' block and replaces the first 'tag:' found after it.
+          # Then does the same for 'frontend:'.
+          sed -i '/backend:/,/tag:/ s/tag: .*/tag: "'"$TAG"'"/' "$FILE"
+          sed -i '/frontend:/,/tag:/ s/tag: .*/tag: "'"$TAG"'"/' "$FILE"
 
-          # Detect if any real change occurred
-          if git diff --quiet "$VALUES_FILE"; then
-            echo "No changes needed – tags already up-to-date ($NEW_TAG)"
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "Tags updated to $NEW_TAG"
+          # Check if the file changed from 'latest' to the SHA
+          if ! git diff --exit-code "$FILE" > /dev/null; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git checkout -b "$PR_BRANCH"
+            git add "$FILE"
+            git commit -m "chore(helm): update $FILE tags to $TAG"
+            git push origin "$PR_BRANCH" --force
             echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ No changes detected. Tags in $FILE are already set to $TAG."
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
-          git diff --color "$VALUES_FILE" || true
-
-      - name: 📤 Commit and push changes
-        if: steps.update.outputs.changed == 'true'
-        run: |
-          git add ${{ steps.env.outputs.file }}
-          git commit -m "chore(helm): update ${{ steps.env.outputs.name }} image tags to ${{ steps.env.outputs.short_sha }}"
-          git push origin ${{ steps.env.outputs.branch }} --force
-
-      - name: 🔄 Create Pull Request targeting the original branch
+      - name: 🔄 Create PR (Native GitHub CLI)
         if: steps.update.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: |
-            **Automated GitOps Tag Update**
-
-            This PR updates the image tags in the Helm values file for the **${{ steps.env.outputs.name }}** environment.
-
-            **File updated**: `${{ steps.env.outputs.file }}`
-            **New image tag applied**: `${{ steps.env.outputs.short_sha }}`
-
-            **Updated images**:
-            - **Backend**: 
-              `${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ steps.env.outputs.short_sha }}`
-            - **Frontend**: 
-              `${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.env.outputs.short_sha }}`
-
-            **What changed**:
-            - `backend.image.tag` → `${{ steps.env.outputs.short_sha }}`
-            - `frontend.image.tag` → `${{ steps.env.outputs.short_sha }}`
-
-            **Unchanged** (third-party images preserved):
-            - `postgres.image.tag`
-            - `redis.image.tag`
-
-            Triggered from commit ${{ github.sha }} on branch `${{ github.ref_name }}`.
-
-            Merging this PR will deploy the new version via your GitOps tool (ArgoCD, Flux, etc.).
-
-            **Temporary branch**: `${{ steps.env.outputs.branch }}` (auto-deleted after merge)
         run: |
+          # Use GH CLI to open the PR targeting the branch that triggered the run
           gh pr create \
             --base ${{ github.ref_name }} \
-            --head ${{ steps.env.outputs.branch }} \
-            --title "Deploy tag ${{ steps.env.outputs.short_sha }} to ${{ steps.env.outputs.name }} environment" \
-            --body "$PR_BODY"
+            --head ${{ steps.vars.outputs.pr_branch }} \
+            --title "🚀 GitOps: Update ${{ steps.vars.outputs.env }} tags to ${{ steps.vars.outputs.short_sha }}" \
+            --body "Automated promotion for environment: **${{ steps.vars.outputs.env }}**. Please review and merge to trigger deployment."
+  
 
-      - name: 📢 Slack Notification - Promotion Result
+      - name: 📝 Prepare Slack Message
+        if: always()
+        id: slack_msg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ENV_NAME="${{ steps.vars.outputs.env }}"
+          SHA="${{ steps.vars.outputs.short_sha }}"
+          
+          if [[ "${{ steps.update.outputs.changed }}" == "true" ]]; then
+            # Use GH CLI to get the PR URL we just created
+            PR_URL=$(gh pr view ${{ steps.vars.outputs.pr_branch }} --json url --jq .url)
+            
+            MSG="*🚀 Promotion to $ENV_NAME*\nNew tag applied: *$SHA*\n<$PR_URL|View Pull Request>\n\nMerge the PR to trigger deployment!"
+          else
+            MSG="*🚀 Promotion to $ENV_NAME*\nAlready up-to-date with tag *$SHA*\nNo PR created."
+          fi
+          
+          # Save the message for the next step
+          echo "content=$MSG" >> $GITHUB_OUTPUT
+
+      - name: 📢 Send Slack Notification
         if: always()
         uses: 8398a7/action-slack@v3
         with:
-          status: success
+          status: ${{ job.status }}
           channel: '#devops'
-          text: |
-            *🚀 Promotion to ${{ steps.env.outputs.name }}*
-
-            {% if steps.update.outputs.changed == 'true' %}
-            New tag applied: **${{ steps.env.outputs.short_sha }}**
-            <$(gh pr view ${{ steps.env.outputs.branch }} --json url --jq .url)|View PR>
-            {% else %}
-            Already up-to-date with tag **${{ steps.env.outputs.short_sha }}**
-            No PR created.
-            {% endif %}
-
-            Merge the PR (if created) to deploy!
+          text: ${{ steps.slack_msg.outputs.content }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
+      
           
   ###################################################
   # JOB 4: CLEANUP OLD GHCR IMAGES (Keep Last 5 Builds)
