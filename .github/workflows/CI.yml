@@ -259,13 +259,13 @@ jobs:
 
           if [[ "${{ github.ref_name }}" == "develop" ]]; then
             ENV_NAME="dev"
-            VALUES_FILE="helm-chart/values-dev.yaml"
+            VALUES_FILE="lab/helm-chart/values-dev.yaml"
           elif [[ "${{ github.ref_name }}" == "main" ]]; then
             ENV_NAME="prod"
-            VALUES_FILE="helm-chart/values-prod.yaml"
+            VALUES_FILE="lab/helm-chart/values-prod.yaml"
           elif [[ "${{ github.ref_name }}" == "qa" ]]; then
             ENV_NAME="qa"
-            VALUES_FILE="helm-chart/values-qa.yaml"
+            VALUES_FILE="lab/helm-chart/values-qa.yaml"
           else
             echo "Unsupported branch: ${{ github.ref_name }}"
             exit 1
@@ -287,15 +287,19 @@ jobs:
         run: |
           git checkout -b ${{ steps.env.outputs.branch }}
 
-      - name: ✏️ Update image tags in values file
+      - name: ✏️ Update image tags in values file (only backend & frontend)
         env:
           NEW_TAG: ${{ steps.env.outputs.short_sha }}
           VALUES_FILE: ${{ steps.env.outputs.file }}
         run: |
-          # Update all lines that have "tag:" (both backend and frontend)
-          sed -i "s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
+          # Update only backend.image.tag (lines within backend: block)
+          sed -i "/^\s*backend:/,/^\s*[^[:space:]]/ s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
+          
+          # Update only frontend.image.tag (lines within frontend: block) 
+          sed -i "/^\s*frontend:/,/^\s*[^[:space:]]/ s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
 
-          echo "Updated $VALUES_FILE with new tag: $NEW_TAG"
+          echo "✅ Safely updated only backend and frontend tags in $VALUES_FILE"
+          echo "📄 New tag applied: $NEW_TAG"
           git diff --color "$VALUES_FILE" || true
 
       - name: 📤 Commit and push changes
@@ -322,19 +326,28 @@ jobs:
             - **Frontend**: 
               `${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.env.outputs.short_sha }}`
 
+            **What changed**:
+            - `backend.image.tag` updated from previous version to `${{ steps.env.outputs.short_sha }}`
+            - `frontend.image.tag` updated from previous version to `${{ steps.env.outputs.short_sha }}`
+
+            **Unchanged** (third-party images):
+            - `postgres.image.tag` remains as-is
+            - `redis.image.tag` remains as-is
+
+            ---
+
             Triggered from commit ${{ github.sha }} on branch `${{ github.ref_name }}`.
 
             Merging this PR will deploy the new version via your GitOps tool (ArgoCD, Flux, etc.).
+
+            **Temporary branch**: `${{ steps.env.outputs.branch }}` (will be deleted after merge)
         run: |
           gh pr create \
             --base ${{ github.ref_name }} \
             --head ${{ steps.env.outputs.branch }} \
             --title "Deploy tag ${{ steps.env.outputs.short_sha }} to ${{ steps.env.outputs.name }} environment" \
-            --body "$PR_BODY" \
-            --label "automated" \
-            --label "deployment" \
-            --label "${{ steps.env.outputs.name }}" \
-            --label "tag-update"
+            --body "$PR_BODY"
+            # No labels added - avoids "label not found" errors
 
       - name: 📢 Slack Notification - Promotion PR Created
         if: always()
@@ -345,25 +358,18 @@ jobs:
           text: |
             *🚀 Promotion PR Created*
 
-            A new pull request has been opened to deploy tag **${{ steps.env.outputs.short_sha }}** to the **${{ steps.env.outputs.name }}** environment.
-
+            **Tag**: ${{ steps.env.outputs.short_sha }}
+            **Environment**: ${{ steps.env.outputs.name }} 
             **File**: ${{ steps.env.outputs.file }}
 
-            View PR: <$(gh pr view ${{ steps.env.outputs.branch }} --json url --jq .url)|PR Link>
+            Updated backend & frontend image tags only (postgres/redis unchanged).
+
+            <$(gh pr view ${{ steps.env.outputs.branch }} --json url --jq .url)|View PR>
 
             Merge to deploy!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-          
-
-
-
-
-
-
-
 
 
   # ###################################################
