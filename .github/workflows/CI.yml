@@ -232,6 +232,140 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
+
+  ###################################################
+  # JOB 3: PROMOTE TO ENVIRONMENT (Update Helm Values + PR)
+  ###################################################
+  promote-to-environment:
+    name: 🚀 Promote to Environment (Helm Values PR)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: success()
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Determine environment, values file, and branch name
+        id: env
+        run: |
+          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${SHORT_SHA:0:7}"  # First 7 characters of commit SHA
+
+          if [[ "${{ github.ref_name }}" == "develop" ]]; then
+            ENV_NAME="dev"
+            VALUES_FILE="lab/helm-chart/values-dev.yaml"
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
+            ENV_NAME="prod"
+            VALUES_FILE="lab/helm-chart/values-prod.yaml"
+          elif [[ "${{ github.ref_name }}" == "qa" ]]; then
+            ENV_NAME="qa"
+            VALUES_FILE="lab/helm-chart/values-qa.yaml"
+          else
+            echo "Unsupported branch: ${{ github.ref_name }}"
+            exit 1
+          fi
+
+          PROMOTE_BRANCH="helm/tag-update-to-$ENV_NAME-$SHORT_SHA"
+
+          echo "name=$ENV_NAME" >> $GITHUB_OUTPUT
+          echo "file=$VALUES_FILE" >> $GITHUB_OUTPUT
+          echo "branch=$PROMOTE_BRANCH" >> $GITHUB_OUTPUT
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: 🛠️ Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🌿 Create temporary promotion branch
+        run: |
+          git checkout -b ${{ steps.env.outputs.branch }}
+
+      - name: ✏️ Update image tags in values file
+        env:
+          NEW_TAG: ${{ steps.env.outputs.short_sha }}
+          VALUES_FILE: ${{ steps.env.outputs.file }}
+        run: |
+          # Update all lines that have "tag:" (both backend and frontend)
+          sed -i "s|^\(\s*tag:\s*\).*|\1$NEW_TAG|" "$VALUES_FILE"
+
+          echo "Updated $VALUES_FILE with new tag: $NEW_TAG"
+          git diff --color "$VALUES_FILE" || true
+
+      - name: 📤 Commit and push changes
+        run: |
+          git add ${{ steps.env.outputs.file }}
+          git commit -m "chore(helm): update ${{ steps.env.outputs.name }} image tags to ${{ steps.env.outputs.short_sha }}"
+          git push origin ${{ steps.env.outputs.branch }} --force
+
+      - name: 🔄 Create Pull Request targeting the original branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: |
+            **Automated GitOps Tag Update**
+
+            This PR updates the image tags in the Helm values file for the **${{ steps.env.outputs.name }}** environment.
+
+            **File updated**: `${{ steps.env.outputs.file }}`
+
+            **New image tag applied**: `${{ steps.env.outputs.short_sha }}`
+
+            **Updated images**:
+            - **Backend**: 
+              `${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:${{ steps.env.outputs.short_sha }}`
+            - **Frontend**: 
+              `${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.env.outputs.short_sha }}`
+
+            Triggered from commit ${{ github.sha }} on branch `${{ github.ref_name }}`.
+
+            Merging this PR will deploy the new version via your GitOps tool (ArgoCD, Flux, etc.).
+        run: |
+          gh pr create \
+            --base ${{ github.ref_name }} \
+            --head ${{ steps.env.outputs.branch }} \
+            --title "Deploy tag ${{ steps.env.outputs.short_sha }} to ${{ steps.env.outputs.name }} environment" \
+            --body "$PR_BODY" \
+            --label "automated" \
+            --label "deployment" \
+            --label "${{ steps.env.outputs.name }}" \
+            --label "tag-update"
+
+      - name: 📢 Slack Notification - Promotion PR Created
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#devops'
+          text: |
+            *🚀 Promotion PR Created*
+
+            A new pull request has been opened to deploy tag **${{ steps.env.outputs.short_sha }}** to the **${{ steps.env.outputs.name }}** environment.
+
+            **File**: ${{ steps.env.outputs.file }}
+
+            View PR: <$(gh pr view ${{ steps.env.outputs.branch }} --json url --jq .url)|PR Link>
+
+            Merge to deploy!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+          
+
+
+
+
+
+
+
+
+
   # ###################################################
   # # JOB 4: NOTIFY
   # ###################################################
