@@ -3,8 +3,12 @@ name: 🚀 DevSecOps CI/CD Pipeline
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'helm-chart/**'
   pull_request:
     branches: [ develop ]
+    paths-ignore:
+      - 'helm-chart/**'
   workflow_dispatch:
 
 env:
