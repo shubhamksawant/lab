@@ -8,34 +8,48 @@ on:
 
 jobs:
   ###################################################
-  # JOB 1: REFRESH (Always Runs Automatically)
+  # JOB 1: REFRESH & NOTIFY (Always Runs)
   ###################################################
   refresh-argocd:
-    name: 🔄 Refresh ArgoCD
+    name: 🔄 Refresh & Request Approval
     runs-on: ubuntu-latest
     steps:
       - name: 🔐 Setup Dynamic Kubeconfig
         run: |
           mkdir -p ~/.kube
-          # 1. Decode the static config
           echo "${{ secrets.KUBECONFIG_STATIC }}" | base64 -d > ~/.kube/config
-          
-          # 2. Patch the server address with the current ngrok tunnel
-          # We use | as a delimiter in sed because the URL contains slashes
           sed -i "s|server:.*|server: https://${{ secrets.NGROK_URL }}|g" ~/.kube/config
-          
-          # 3. Disable TLS verification because the certificate is for 127.0.0.1, not ngrok
           sed -i "/certificate-authority-data:.*/d" ~/.kube/config
           sed -i "/cluster:/a \    insecure-skip-tls-verify: true" ~/.kube/config
-          
           chmod 600 ~/.kube/config
-          kubectl cluster-info
 
       - name: 🔄 Trigger ArgoCD Hard Refresh
         run: |
           echo "Force-refreshing humor-game-monitor..."
           kubectl annotate application humor-game-monitor -n argocd \
             argocd.argoproj.io/refresh=hard --overwrite
+
+      - name: 📢 Slack - Requesting Approval
+        # MOVED HERE: This now sends immediately after the refresh
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,repo
+          custom_payload: |
+            {
+              "attachments": [{
+                "color": "#ebba34",
+                "title": "🛑 Deployment Approval Required",
+                "text": "ArgoCD refreshed for *${{ github.ref_name }}*.\nTunnel: `${{ secrets.NGROK_URL }}`\n\nPlease approve the sync in GitHub to proceed.",
+                "actions": [{
+                  "type": "button",
+                  "text": "Review & Approve in GitHub",
+                  "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   ###################################################
   # JOB 2: SYNC (Waits for Manual Approval)
@@ -44,7 +58,7 @@ jobs:
     name: 🚀 Approval & Sync
     needs: refresh-argocd
     runs-on: ubuntu-latest
-    # This ENVIRONMENT line triggers the manual approval button in GitHub UI
+    # This ENVIRONMENT must have protection rules in GitHub Settings
     environment: ${{ (github.ref_name == 'main' && 'production') || (github.ref_name == 'qa' && 'qa') || 'development' }}
     
     steps:
@@ -56,27 +70,6 @@ jobs:
           sed -i "/certificate-authority-data:.*/d" ~/.kube/config
           sed -i "/cluster:/a \    insecure-skip-tls-verify: true" ~/.kube/config
           chmod 600 ~/.kube/config
-
-      - name: 📢 Slack - Requesting Approval
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          fields: workflow,repo
-          custom_payload: |
-            {
-              "attachments": [{
-                "color": "#ebba34",
-                "title": "🛑 Deployment Approval Required",
-                "text": "Environment: *${{ github.ref_name }}*\nArgoCD refreshed via Tunnel. Please approve to Sync.",
-                "actions": [{
-                  "type": "button",
-                  "text": "Approve Sync",
-                  "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                }]
-              }]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: 🚀 Trigger Sync (Native Kubectl Patch)
         run: |
@@ -94,6 +87,6 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: success
-          text: "✅ *Sync Successful!* humor-game-monitor is live on your local system."
+          text: "✅ *Sync Successful!* The changes are now live on your local system."
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
